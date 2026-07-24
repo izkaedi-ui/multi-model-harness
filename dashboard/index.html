@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Multi-Provider LLM Security Test Harness — interactive dashboard for comparing model safety across providers.">
+  <title>LLM Security Test Harness</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">⬡</div>
+      <div class="brand-text">
+        <div class="brand-title">LLM Harness</div>
+        <div class="brand-sub">Security Evaluation</div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Overview</div>
+      <a href="#" class="nav-item active" data-view="overview" id="nav-overview">
+        <span class="nav-icon">◈</span> Dashboard
+      </a>
+      <a href="#" class="nav-item" data-view="comparison" id="nav-comparison">
+        <span class="nav-icon">⇌</span> Provider Comparison
+      </a>
+      <a href="#" class="nav-item" data-view="leaderboard" id="nav-leaderboard">
+        <span class="nav-icon">◎</span> Model Leaderboard
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Analysis</div>
+      <a href="#" class="nav-item" data-view="categories" id="nav-categories">
+        <span class="nav-icon">◉</span> Categories
+      </a>
+      <a href="#" class="nav-item" data-view="heatmap" id="nav-heatmap">
+        <span class="nav-icon">▦</span> Failure Heatmap
+      </a>
+      <a href="#" class="nav-item" data-view="timeline" id="nav-timeline">
+        <span class="nav-icon">〜</span> Historical Trends
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Detail</div>
+      <a href="#" class="nav-item" data-view="runs" id="nav-runs">
+        <span class="nav-icon">▷</span> Run Explorer
+      </a>
+      <a href="#" class="nav-item" data-view="evidence" id="nav-evidence">
+        <span class="nav-icon">◇</span> Evidence
+      </a>
+      <a href="#" class="nav-item" data-view="cost" id="nav-cost">
+        <span class="nav-icon">◑</span> Cost Analysis
+      </a>
+    </div>
+
+    <div class="sidebar-footer">
+      <button class="btn-load" id="btn-load-fixture" onclick="document.getElementById('file-input').click()">
+        ↑ Load Fixture
+      </button>
+      <input type="file" id="file-input" accept=".json" style="display:none">
+    </div>
+  </nav>
+
+  <!-- Main content -->
+  <main class="main" id="main">
+    <!-- Header -->
+    <header class="top-bar">
+      <div class="top-bar-left">
+        <h1 class="page-title" id="page-title">Dashboard</h1>
+        <div class="run-badge" id="run-badge">No fixture loaded</div>
+      </div>
+      <div class="top-bar-right">
+        <div class="stat-chip" id="chip-pass">
+          <span class="chip-dot dot-pass"></span>
+          <span id="chip-pass-count">—</span> Pass
+        </div>
+        <div class="stat-chip" id="chip-fail">
+          <span class="chip-dot dot-fail"></span>
+          <span id="chip-fail-count">—</span> Fail
+        </div>
+        <div class="stat-chip">
+          <span class="chip-dot dot-warn"></span>
+          <span id="chip-warn-count">—</span> Warn
+        </div>
+      </div>
+    </header>
+
+    <!-- Views -->
+    <div class="views">
+
+      <!-- ── Overview ──────────────────────────────────────────── -->
+      <section class="view active" id="view-overview">
+        <div class="kpi-row" id="kpi-row">
+          <div class="kpi-card">
+            <div class="kpi-label">Total Runs</div>
+            <div class="kpi-value" id="kpi-runs">—</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Pass Rate</div>
+            <div class="kpi-value kpi-green" id="kpi-pass-rate">—</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Total Tokens</div>
+            <div class="kpi-value" id="kpi-tokens">—</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Total Cost</div>
+            <div class="kpi-value" id="kpi-cost">—</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">P50 Latency</div>
+            <div class="kpi-value" id="kpi-latency">—</div>
+          </div>
+        </div>
+
+        <div class="charts-row">
+          <div class="chart-card wide">
+            <div class="chart-title">Verdict Distribution by Category</div>
+            <canvas id="chart-category-verdicts" height="220"></canvas>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title">Overall Pass / Fail</div>
+            <canvas id="chart-donut" height="220"></canvas>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <div class="table-title">Recent Executions</div>
+          <div class="table-scroll">
+            <table class="data-table" id="table-recent">
+              <thead><tr>
+                <th>Case ID</th><th>Category</th><th>Provider</th>
+                <th>Model</th><th>Latency</th><th>Verdict</th>
+              </tr></thead>
+              <tbody id="tbody-recent"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Provider Comparison ───────────────────────────────── -->
+      <section class="view" id="view-comparison">
+        <div class="chart-card full">
+          <div class="chart-title">Pass Rate by Provider</div>
+          <canvas id="chart-provider-pass" height="300"></canvas>
+        </div>
+        <div class="chart-card full">
+          <div class="chart-title">Average Latency by Provider (ms)</div>
+          <canvas id="chart-provider-latency" height="260"></canvas>
+        </div>
+      </section>
+
+      <!-- ── Model Leaderboard ─────────────────────────────────── -->
+      <section class="view" id="view-leaderboard">
+        <div class="table-card full">
+          <div class="table-title">Model Leaderboard — Ranked by Pass Rate</div>
+          <div class="table-scroll">
+            <table class="data-table" id="table-leaderboard">
+              <thead><tr>
+                <th>Rank</th><th>Model</th><th>Provider</th>
+                <th>Pass</th><th>Fail</th><th>Pass Rate</th>
+                <th>Avg Latency</th><th>Tokens</th>
+              </tr></thead>
+              <tbody id="tbody-leaderboard"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Categories ────────────────────────────────────────── -->
+      <section class="view" id="view-categories">
+        <div class="category-grid" id="category-grid"></div>
+      </section>
+
+      <!-- ── Failure Heatmap ───────────────────────────────────── -->
+      <section class="view" id="view-heatmap">
+        <div class="table-card full">
+          <div class="table-title">Failure Heatmap — Category × Provider</div>
+          <div id="heatmap-container"></div>
+        </div>
+      </section>
+
+      <!-- ── Timeline ──────────────────────────────────────────── -->
+      <section class="view" id="view-timeline">
+        <div class="chart-card full">
+          <div class="chart-title">Score Trend Over Time</div>
+          <canvas id="chart-timeline" height="300"></canvas>
+        </div>
+      </section>
+
+      <!-- ── Run Explorer ──────────────────────────────────────── -->
+      <section class="view" id="view-runs">
+        <div class="table-card full">
+          <div class="table-title">All Executions</div>
+          <div class="filter-bar">
+            <input type="text" class="filter-input" id="filter-runs" placeholder="Filter by case ID or category…">
+            <select class="filter-select" id="filter-verdict">
+              <option value="">All verdicts</option>
+              <option value="pass">Pass</option>
+              <option value="fail">Fail</option>
+              <option value="warn">Warn</option>
+            </select>
+            <select class="filter-select" id="filter-provider">
+              <option value="">All providers</option>
+            </select>
+          </div>
+          <div class="table-scroll">
+            <table class="data-table" id="table-runs">
+              <thead><tr>
+                <th>Case ID</th><th>Category</th><th>Provider</th><th>Model</th>
+                <th>Status</th><th>Latency</th><th>Tokens</th><th>Verdict</th><th>Detail</th>
+              </tr></thead>
+              <tbody id="tbody-runs"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Detail panel -->
+        <div class="detail-panel" id="detail-panel" style="display:none">
+          <div class="detail-header">
+            <span id="detail-title">Run Detail</span>
+            <button class="detail-close" onclick="closeDetail()">✕</button>
+          </div>
+          <div class="detail-body" id="detail-body"></div>
+        </div>
+      </section>
+
+      <!-- ── Evidence ──────────────────────────────────────────── -->
+      <section class="view" id="view-evidence">
+        <div class="table-card full">
+          <div class="table-title">Evidence Chain</div>
+          <div class="evidence-grid" id="evidence-grid"></div>
+        </div>
+      </section>
+
+      <!-- ── Cost Analysis ─────────────────────────────────────── -->
+      <section class="view" id="view-cost">
+        <div class="charts-row">
+          <div class="chart-card wide">
+            <div class="chart-title">Spend by Provider (USD)</div>
+            <canvas id="chart-cost-provider" height="260"></canvas>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title">Token Usage by Provider</div>
+            <canvas id="chart-tokens-provider" height="260"></canvas>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /views -->
+  </main>
+
+  <!-- Empty state overlay -->
+  <div class="empty-state" id="empty-state">
+    <div class="empty-icon">⬡</div>
+    <h2>Load a fixture to begin</h2>
+    <p>Run <code>harness export --run-id &lt;id&gt;</code> to generate a fixture file,<br>then drag it here or use the button in the sidebar.</p>
+    <button class="btn-load large" onclick="document.getElementById('file-input').click()">
+      ↑ Load Fixture JSON
+    </button>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

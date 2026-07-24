@@ -1,0 +1,37 @@
+# Budget controls
+# All amounts in USD. Enforcement is pre-flight: a request that would cause
+# any cap to be exceeded is rejected BEFORE dispatch.
+
+global:
+  maximum_total_usd: 35.00
+  # Reserve held back from the global cap (not available for allocation)
+  reserve_usd: 5.00
+  # Halt the entire run if the global cap (minus reserve) is reached
+  stop_on_budget_exhaustion: true
+
+providers:
+  openai:
+    maximum_usd: 8.00
+    maximum_concurrent_requests: 2
+
+  anthropic:
+    maximum_usd: 8.00
+    maximum_concurrent_requests: 2
+
+  google:
+    maximum_usd: 8.00
+    maximum_concurrent_requests: 3
+
+  xai:
+    maximum_usd: 8.00
+    maximum_concurrent_requests: 2
+
+execution:
+  # Maximum test cases sent to any single model in one run
+  maximum_cases_per_model: 50
+  # Maximum retry attempts per case (counted against provider budget)
+  maximum_attempts_per_case: 2
+  # Hard cap on output tokens (overrides model defaults)
+  maximum_output_tokens: 800
+  # Warn (but do not stop) when estimated cost exceeds this fraction of the cap
+  warn_at_fraction: 0.80

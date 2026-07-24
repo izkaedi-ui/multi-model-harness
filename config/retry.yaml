@@ -1,0 +1,39 @@
+# Retry policy
+
+# HTTP status codes that are safe to retry (transient server errors)
+retryable_status_codes:
+  - 408  # Request Timeout
+  - 429  # Too Many Requests
+  - 500  # Internal Server Error
+  - 502  # Bad Gateway
+  - 503  # Service Unavailable
+  - 504  # Gateway Timeout
+
+# Exception types (string names) that indicate transient network failure
+retryable_exception_patterns:
+  - "ConnectionResetError"
+  - "TimeoutError"
+  - "ConnectTimeout"
+  - "ReadTimeout"
+  - "RemoteProtocolError"
+  - "temporary DNS failure"
+
+# HTTP status codes / conditions that must NOT be retried
+non_retryable_status_codes:
+  - 400  # Bad Request — malformed request, will not improve
+  - 401  # Unauthorized — credentials are wrong
+  - 403  # Forbidden — model/operation not permitted
+  - 404  # Not Found — invalid model name
+  - 422  # Unprocessable Entity — schema validation failure
+
+# Timing
+max_attempts: 3
+base_delay_seconds: 1.0
+max_delay_seconds: 20.0
+# Backoff multiplier applied each attempt: delay = min(base * multiplier^n, max)
+backoff_multiplier: 2.0
+# Maximum random jitter added to each delay (seconds)
+jitter_max_seconds: 2.0
+
+# Per-request hard timeout (also enforced by timeout_manager.py)
+per_request_timeout_seconds: 60

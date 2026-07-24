@@ -1,0 +1,108 @@
+﻿multi-model-harness\
+├── adapters\
+│   ├── __init__.py
+│   ├── anthropic_adapter.py
+│   ├── auth.py
+│   ├── base_adapter.py
+│   ├── capability_registry.py
+│   ├── cost_estimator.py
+│   ├── gemini_adapter.py
+│   ├── openai_adapter.py
+│   ├── provider_factory.py
+│   ├── rate_limiter.py
+│   ├── request_normalizer.py
+│   ├── response_normalizer.py
+│   └── xai_adapter.py
+├── artifacts\
+│   └── reports
+│       └── fixture_seed.json
+├── categories\
+│   ├── content_integrity
+│   │   ├── cases
+│   │   │   └── integrity_cases.jsonl
+│   │   ├── category.py
+│   │   └── evaluator.py
+│   ├── context_isolation
+│   │   ├── cases
+│   │   │   └── isolation_cases.jsonl
+│   │   ├── category.py
+│   │   └── evaluator.py
+│   ├── guardrail_consistency
+│   │   ├── cases
+│   │   │   ├── benign_controls.jsonl
+│   │   │   ├── multilingual_consistency.jsonl
+│   │   │   ├── refusal_stability.jsonl
+│   │   │   └── transformation_consistency.jsonl
+│   │   ├── category.py
+│   │   ├── evaluator.py
+│   │   └── rubric.yaml
+│   ├── long_context_behavior
+│   │   ├── cases
+│   │   │   └── longctx_cases.jsonl
+│   │   ├── category.py
+│   │   └── evaluator.py
+│   ├── prompt_robustness
+│   │   ├── cases
+│   │   │   └── robustness_cases.jsonl
+│   │   ├── category.py
+│   │   └── evaluator.py
+│   ├── tool_use_boundaries
+│   │   ├── cases
+│   │   │   └── tool_cases.jsonl
+│   │   ├── category.py
+│   │   └── evaluator.py
+│   ├── base.py
+│   └── registry.py
+├── cli\
+│   └── main.py
+├── config\
+│   ├── budgets.yaml
+│   ├── models.yaml
+│   ├── providers.yaml
+│   ├── redaction.yaml
+│   ├── retry.yaml
+│   ├── scoring.yaml
+│   └── settings.yaml
+├── dashboard\
+│   ├── app.js
+│   ├── index.html
+│   └── style.css
+├── database\
+│   ├── migrations
+│   │   ├── 001_initial.sql
+│   │   └── 002_scores.sql
+│   ├── repository.py
+│   ├── schema.sql
+│   ├── sqlite.py
+│   └── transactions.py
+├── runner\
+│   ├── cost_guard.py
+│   ├── execution_plan.py
+│   ├── exporter.py
+│   ├── metrics.py
+│   ├── response_store.py
+│   ├── retry_manager.py
+│   ├── runner.py
+│   ├── scorer.py
+│   └── verdict_engine.py
+├── scripts\
+│   ├── bootstrap.py
+│   └── seed_examples.py
+├── security\
+│   ├── artifact_scanner.py
+│   ├── input_validator.py
+│   ├── output_sanitizer.py
+│   └── secret_redactor.py
+├── src\
+│   └── security_harness
+│       ├── __init__.py
+│       ├── clock.py
+│       ├── correlation.py
+│       ├── errors.py
+│       ├── logging.py
+│       └── types.py
+├── .env.example
+├── .gitignore
+├── harness.db
+├── pyproject.toml
+├── README.md

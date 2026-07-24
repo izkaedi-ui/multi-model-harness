@@ -1,0 +1,53 @@
+# Global harness settings
+
+execution:
+  # Maximum simultaneous provider requests (across all providers)
+  max_global_concurrency: 8
+  # Per-request timeout in seconds
+  per_request_timeout_seconds: 60
+  # Maximum wall-clock time for an entire run (0 = unlimited)
+  run_deadline_seconds: 3600
+  # Maximum output tokens per request (overridable per-model in models.yaml)
+  default_max_output_tokens: 800
+
+storage:
+  # Where to persist raw artifacts
+  artifacts_dir: ./artifacts
+  # Where to write checkpoint files for resume support
+  checkpoints_dir: ./checkpoints
+  # Where to write logs
+  logs_dir: ./logs
+  # SQLite database path (used when DATABASE_URL is not set)
+  sqlite_path: ./harness.db
+
+logging:
+  level: INFO  # DEBUG | INFO | WARNING | ERROR
+  format: json  # json | text
+  redact_enabled: true
+  # Redact any field matching these key names (case-insensitive)
+  redacted_field_names:
+    - api_key
+    - authorization
+    - x-api-key
+    - token
+    - secret
+    - password
+    - credential
+
+safety:
+  # Refuse to run if redaction is disabled
+  require_redaction: true
+  # Refuse to start if any API key appears in a config file value
+  disallow_keys_in_config: true
+  # Maximum prompt size to accept (characters)
+  max_prompt_chars: 32000
+  # Maximum response size to store (characters)
+  max_response_chars: 64000
+
+reporting:
+  # Default output formats when --format is not specified
+  default_formats:
+    - json
+    - markdown
+  # Include raw (redacted) responses in reports
+  include_raw_responses: true

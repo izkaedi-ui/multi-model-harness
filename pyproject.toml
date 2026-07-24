@@ -1,0 +1,98 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "security-test-harness"
+version = "0.1.0"
+description = "Multi-provider LLM Security Test Harness — reproducible evaluation of guardrails, tool-use safety, prompt robustness, context isolation, long-context behavior, and content integrity."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "ZKAEDI" }]
+
+dependencies = [
+    # Provider SDKs
+    "openai>=1.30.0",
+    "anthropic>=0.25.0",
+    # HTTP
+    "httpx>=0.27.0",
+    # Config / YAML
+    "pyyaml>=6.0",
+    # CLI
+    "click>=8.1.0",
+    "rich>=13.0.0",
+    # Database
+    "aiosqlite>=0.19.0",
+    # Templating (reports)
+    "jinja2>=3.1.0",
+    # Async utilities
+    "anyio>=4.0.0",
+    # Environment loading
+    "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+semantic = [
+    "sentence-transformers>=2.6.0",
+]
+postgres = [
+    "asyncpg>=0.29.0",
+]
+pdf = [
+    "weasyprint>=61.0",
+]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=5.0.0",
+    "ruff>=0.4.0",
+    "mypy>=1.10.0",
+    "types-pyyaml>=6.0.12",
+    "respx>=0.21.0",
+]
+
+[project.scripts]
+harness = "security_harness.cli.main:cli"
+
+[project.entry-points."security_harness.categories"]
+guardrail_consistency = "security_harness.categories.guardrail_consistency.category:GuardrailConsistencyCategory"
+tool_use_boundaries = "security_harness.categories.tool_use_boundaries.category:ToolUseBoundariesCategory"
+prompt_robustness = "security_harness.categories.prompt_robustness.category:PromptRobustnessCategory"
+context_isolation = "security_harness.categories.context_isolation.category:ContextIsolationCategory"
+long_context_behavior = "security_harness.categories.long_context_behavior.category:LongContextBehaviorCategory"
+content_integrity = "security_harness.categories.content_integrity.category:ContentIntegrityCategory"
+
+[tool.hatch.build.targets.wheel]
+packages = [
+  "src/security_harness",
+  "adapters",
+  "categories",
+  "runner",
+  "database",
+  "evaluation",
+  "security",
+  "reports",
+  "cli"
+]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+ignore = ["B008"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+markers = [
+    "integration: marks tests that require live API credentials",
+    "slow: marks tests that take more than 5 seconds",
+]

@@ -1,0 +1,66 @@
+# Redaction configuration
+# Patterns are applied to all log output, report content, and artifact files
+# before they are written to disk or transmitted.
+
+# Fields whose VALUES are always replaced with [REDACTED] (case-insensitive key match)
+sensitive_field_names:
+  - api_key
+  - apikey
+  - api-key
+  - x-api-key
+  - authorization
+  - bearer
+  - token
+  - secret
+  - password
+  - credential
+  - private_key
+  - client_secret
+  - access_token
+  - refresh_token
+  - session_token
+  - auth_token
+
+# Regex patterns applied to string values (matched pattern replaced with [REDACTED])
+# Each pattern should be as narrow as possible to avoid over-redaction.
+value_patterns:
+  # OpenAI API key format
+  - pattern: 'sk-[A-Za-z0-9_-]{20,}'
+    replacement: "[OPENAI-KEY-REDACTED]"
+
+  # Anthropic API key format
+  - pattern: 'sk-ant-[A-Za-z0-9_-]{20,}'
+    replacement: "[ANTHROPIC-KEY-REDACTED]"
+
+  # Google API key format
+  - pattern: 'AIza[A-Za-z0-9_-]{35}'
+    replacement: "[GOOGLE-KEY-REDACTED]"
+
+  # Generic bearer token in Authorization header
+  - pattern: 'Bearer\s+[A-Za-z0-9._-]{20,}'
+    replacement: "Bearer [TOKEN-REDACTED]"
+
+  # Generic long hex strings (potential tokens)
+  - pattern: '[0-9a-fA-F]{64}'
+    replacement: "[HEX-TOKEN-REDACTED]"
+
+  # Email addresses (PII protection)
+  - pattern: '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'
+    replacement: "[EMAIL-REDACTED]"
+
+# Fields that should never appear in any output (key presence triggers warning)
+forbidden_output_fields:
+  - api_key
+  - authorization
+
+# Scan these artifact file extensions before export
+scan_extensions:
+  - .json
+  - .jsonl
+  - .yaml
+  - .yml
+  - .txt
+  - .log
+  - .md
+  - .html
+  - .csv

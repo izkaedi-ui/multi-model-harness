@@ -1,0 +1,94 @@
+# Model registry
+# Pricing in USD per 1 million tokens (input / output)
+
+openai:
+  gpt-4o:
+    provider: openai
+    context_limit: 128000
+    max_output_tokens: 4096
+    default_temperature: 0.0
+    supports_tools: true
+    supports_system_messages: true
+    supports_json_schema: true
+    pricing:
+      input_per_million: 5.00
+      output_per_million: 15.00
+
+  gpt-4o-mini:
+    provider: openai
+    context_limit: 128000
+    max_output_tokens: 4096
+    default_temperature: 0.0
+    supports_tools: true
+    supports_system_messages: true
+    supports_json_schema: true
+    pricing:
+      input_per_million: 0.15
+      output_per_million: 0.60
+
+
+anthropic:
+  claude-sonnet-4-6:
+    provider: anthropic
+    context_limit: 200000
+    max_output_tokens: 8192
+    default_temperature: 0.0
+    supports_tools: true
+    supports_system_messages: true
+    supports_json_schema: false
+    pricing:
+      input_per_million: 3.00
+      output_per_million: 15.00
+
+  claude-opus-4-5-20251101:
+    provider: anthropic
+    context_limit: 200000
+    max_output_tokens: 8192
+    default_temperature: 0.0
+    supports_tools: true
+    supports_system_messages: true
+    supports_json_schema: false
+    pricing:
+      input_per_million: 15.00
+      output_per_million: 75.00
+
+
+
+
+google:
+  gemini-1.5-pro:
+    provider: google
+    context_limit: 1000000
+    max_output_tokens: 8192
+    default_temperature: 0.0
+    supports_tools: true
+    supports_system_messages: true
+    supports_json_schema: true
+    pricing:
+      input_per_million: 3.50
+      output_per_million: 10.50
+
+  gemini-1.5-flash:
+    provider: google
+    context_limit: 1000000
+    max_output_tokens: 8192
+    default_temperature: 0.0
+    supports_tools: true
+    supports_system_messages: true
+    supports_json_schema: true
+    pricing:
+      input_per_million: 0.075
+      output_per_million: 0.30
+
+xai:
+  grok-beta:
+    provider: xai
+    context_limit: 131072
+    max_output_tokens: 4096
+    default_temperature: 0.0
+    supports_tools: true
+    supports_system_messages: true
+    supports_json_schema: false
+    pricing:
+      input_per_million: 5.00
+      output_per_million: 15.00

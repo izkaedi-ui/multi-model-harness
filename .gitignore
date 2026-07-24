@@ -1,0 +1,55 @@
+# Environment
+.env
+*.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Database files — never commit live databases
+*.db
+*.sqlite
+*.sqlite3
+harness.db
+
+# Artifacts and generated outputs
+artifacts/requests/
+artifacts/responses/
+artifacts/evidence/
+artifacts/manifests/
+artifacts/reports/*.json
+logs/
+
+# API key files
+*.key
+*.pem
+*.p12
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Checkpoints (contain partial run state — may have sensitive data)
+checkpoints/

@@ -1,0 +1,49 @@
+# Provider connection settings
+
+openai:
+  base_url: https://api.openai.com/v1
+  api_family: openai_chat
+  env_key: OPENAI_API_KEY
+  # Maximum simultaneous requests to this provider
+  max_concurrent_requests: 2
+  # Rate limit (requests per minute); 0 = no local limit
+  requests_per_minute: 60
+  # Features this provider supports at the platform level
+  features:
+    - chat_completion
+    - tool_calling
+    - json_mode
+    - streaming
+
+anthropic:
+  base_url: https://api.anthropic.com
+  api_family: anthropic_messages
+  env_key: ANTHROPIC_API_KEY
+  max_concurrent_requests: 2
+  requests_per_minute: 50
+  features:
+    - messages
+    - tool_calling
+    - streaming
+
+google:
+  base_url: https://generativelanguage.googleapis.com
+  api_family: google_generative_ai
+  env_key: GOOGLE_API_KEY
+  max_concurrent_requests: 3
+  requests_per_minute: 60
+  features:
+    - generate_content
+    - tool_calling
+    - json_mode
+    - streaming
+
+xai:
+  base_url: https://api.x.ai/v1
+  api_family: openai_chat
+  env_key: XAI_API_KEY
+  max_concurrent_requests: 2
+  requests_per_minute: 30
+  features:
+    - chat_completion
+    - tool_calling
