@@ -58,16 +58,29 @@ def build_adapter(
         ConfigurationError: If the provider name is not registered.
     """
     dotted_path = _ADAPTER_CLASSES.get(provider)
-    if dotted_path is None:
-        raise ConfigurationError(
-            f"Unknown provider {provider!r}. "
-            f"Registered providers: {list(_ADAPTER_CLASSES)}"
-        )
+    if dotted_path is not None:
+        cls = _import_class(dotted_path)
+        adapter = cls(api_key=api_key, retry_config=retry_config)
+        log.info("provider_factory.built", extra={"provider": provider})
+        return adapter  # type: ignore[return-value]
 
-    cls = _import_class(dotted_path)
-    adapter = cls(api_key=api_key, retry_config=retry_config)
-    log.info("provider_factory.built", extra={"provider": provider})
-    return adapter  # type: ignore[return-value]
+    # Dynamic Plugin Fallback
+    try:
+        from src.security_harness.plugins.registry import PluginRegistry
+        registry = PluginRegistry()
+        plugin = registry.load_plugin(provider)
+        if plugin is not None and hasattr(plugin, "create_adapter"):
+            adapter = plugin.create_adapter({"api_key": api_key, "retry_config": retry_config})
+            log.info("provider_factory.plugin_built", extra={"provider": provider})
+            return adapter
+    except Exception as e:
+        log.warning(f"Failed plugin lookup for {provider}: {e}")
+
+    raise ConfigurationError(
+        f"Unknown provider {provider!r}. "
+        f"Registered providers: {list(_ADAPTER_CLASSES)}"
+    )
+
 
 
 def build_all_adapters(

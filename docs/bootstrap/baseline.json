@@ -1,0 +1,15 @@
+{
+  "bootstrap_phase": 0,
+  "timestamp": "2026-07-24T06:28:00Z",
+  "repository": "F:\\multi-model-harness",
+  "branch": "main",
+  "commit": "399b73a7d0494f09a627da4f6dc31e09ae4d2462",
+  "latest_tag": "v0.2.8",
+  "python_version": "Python 3.14.3",
+  "release_gate_verdict": "ready",
+  "doctor_status": "HEALTHY",
+  "test_count": 34,
+  "tests_passed": 34,
+  "registered_providers": ["openai", "anthropic", "google", "xai"],
+  "registered_models_count": 6
+}
