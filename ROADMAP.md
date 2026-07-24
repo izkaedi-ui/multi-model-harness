@@ -196,8 +196,11 @@ $$\text{Efficiency Score} = \frac{\text{Evaluation Pass Rate (\%)}}{\text{Cost p
 
 ## 🌌 Part IV — Full System Integration Topology
 
+![Omega Supreme Architecture](docs/assets/omega_supreme_roadmap.svg)
+
 ```text
                                 User Interfaces
+
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │ Web Dashboard │ CLI (main.py) │ REST API │ Python SDK │ IDE Extensions │ MCP│
 └─────────────────────────────────────────────────────────────────────────────┘

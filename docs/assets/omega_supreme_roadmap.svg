@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1200" viewBox="0 0 1600 1200">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#090b16"/>
+      <stop offset="55%" stop-color="#11172a"/>
+      <stop offset="100%" stop-color="#1b1236"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#56e0ff"/>
+      <stop offset="50%" stop-color="#9f7cff"/>
+      <stop offset="100%" stop-color="#ff6fd8"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#000" flood-opacity=".35"/>
+    </filter>
+    <style>
+      .title{font:800 64px Inter,Segoe UI,Arial,sans-serif;fill:#fff;letter-spacing:1px}
+      .subtitle{font:500 23px Inter,Segoe UI,Arial,sans-serif;fill:#b8c6ff}
+      .section{font:800 26px Inter,Segoe UI,Arial,sans-serif;fill:#fff}
+      .layer{font:800 24px Inter,Segoe UI,Arial,sans-serif;fill:#fff}
+      .body{font:500 17px Inter,Segoe UI,Arial,sans-serif;fill:#d9e0ff}
+      .small{font:500 14px Inter,Segoe UI,Arial,sans-serif;fill:#c7d0ff}
+      .omega{font:800 18px Inter,Segoe UI,Arial,sans-serif;fill:#fff}
+      .principle{font:700 17px Inter,Segoe UI,Arial,sans-serif;fill:#fff}
+    </style>
+  </defs>
+
+  <rect width="1600" height="1200" fill="url(#bg)"/>
+  <circle cx="1420" cy="150" r="220" fill="#7f5cff" opacity=".10"/>
+  <circle cx="130" cy="1020" r="260" fill="#00d9ff" opacity=".08"/>
+
+  <text x="80" y="95" class="title">Ω OMEGA SUPREME</text>
+  <text x="82" y="136" class="subtitle">Autonomous AI Engineering Platform — Build once. Evaluate everything. Improve continuously.</text>
+  <rect x="80" y="162" width="1440" height="6" rx="3" fill="url(#accent)"/>
+
+  <text x="80" y="220" class="section">NORTH-STAR ARCHITECTURE</text>
+
+  <g filter="url(#shadow)">
+    <rect x="80" y="250" width="1440" height="100" rx="20" fill="#18203a" stroke="#5ee7ff" stroke-width="2"/>
+    <text x="120" y="290" class="layer">AI ENGINEERING PLATFORM</text>
+    <text x="120" y="322" class="body">Dashboard • CLI • REST • SDKs • IDE • MCP • CI/CD • Automation</text>
+
+    <rect x="80" y="370" width="1440" height="100" rx="20" fill="#1f2145" stroke="#7f7cff" stroke-width="2"/>
+    <text x="120" y="410" class="layer">CONTROL PLANE &amp; POLICY ENGINE</text>
+    <text x="120" y="442" class="body">Scheduler • Auth • Budgets • RBAC • Events • Notifications • Approvals</text>
+
+    <rect x="80" y="490" width="1440" height="100" rx="20" fill="#271f4b" stroke="#b06cff" stroke-width="2"/>
+    <text x="120" y="530" class="layer">EVALUATION &amp; INTELLIGENCE CORE</text>
+    <text x="120" y="562" class="body">Benchmarks • Scoring • Analytics • Routing • Cost • Security • Regression Intelligence</text>
+
+    <rect x="80" y="610" width="1440" height="100" rx="20" fill="#32204c" stroke="#e36bff" stroke-width="2"/>
+    <text x="120" y="650" class="layer">PROVIDER, AGENT &amp; TOOL ABSTRACTION</text>
+    <text x="120" y="682" class="body">Cloud LLMs • Local LLMs • Agent Frameworks • MCP • Vector DBs • External APIs</text>
+
+    <rect x="80" y="730" width="1440" height="100" rx="20" fill="#40203f" stroke="#ff6fb8" stroke-width="2"/>
+    <text x="120" y="770" class="layer">STORAGE &amp; OBSERVABILITY FOUNDATION</text>
+    <text x="120" y="802" class="body">SQL • Object Storage • Metrics • Traces • Audit • Reports • Reproducibility Manifests</text>
+  </g>
+
+  <text x="80" y="890" class="section">OMEGA CAPABILITY MATRIX</text>
+
+  <g>
+    <rect x="80" y="920" width="280" height="78" rx="16" fill="#17223e" stroke="#4eddf8"/>
+    <text x="100" y="949" class="omega">Ω-1 Universal AI Layer</text><text x="100" y="974" class="small">Models, agents, workflows, tools</text>
+
+    <rect x="380" y="920" width="280" height="78" rx="16" fill="#1b2242" stroke="#6a9cff"/>
+    <text x="400" y="949" class="omega">Ω-2 Autonomous OS</text><text x="400" y="974" class="small">Discover → analyze → improve</text>
+
+    <rect x="680" y="920" width="280" height="78" rx="16" fill="#232046" stroke="#917cff"/>
+    <text x="700" y="949" class="omega">Ω-3 Benchmark Graph</text><text x="700" y="974" class="small">Reasoning, tools, latency, cost</text>
+
+    <rect x="980" y="920" width="280" height="78" rx="16" fill="#2c2049" stroke="#c86cff"/>
+    <text x="1000" y="949" class="omega">Ω-4 AI Digital Twin</text><text x="1000" y="974" class="small">Capture, replay, predict impact</text>
+
+    <rect x="1280" y="920" width="240" height="78" rx="16" fill="#352044" stroke="#f06dcf"/>
+    <text x="1300" y="949" class="omega">Ω-5 Model Scientist</text><text x="1300" y="974" class="small">Discover, test, publish</text>
+
+    <rect x="80" y="1014" width="280" height="78" rx="16" fill="#17223e" stroke="#4eddf8"/>
+    <text x="100" y="1043" class="omega">Ω-6 AI Genome</text><text x="100" y="1068" class="small">Capability fingerprints &amp; routing</text>
+
+    <rect x="380" y="1014" width="280" height="78" rx="16" fill="#1b2242" stroke="#6a9cff"/>
+    <text x="400" y="1043" class="omega">Ω-7 Evolving Benchmarks</text><text x="400" y="1068" class="small">Generate, mutate, retain hardest</text>
+
+    <rect x="680" y="1014" width="280" height="78" rx="16" fill="#232046" stroke="#917cff"/>
+    <text x="700" y="1043" class="omega">Ω-8 Agent Arena</text><text x="700" y="1068" class="small">Teams, recovery, coordination</text>
+
+    <rect x="980" y="1014" width="280" height="78" rx="16" fill="#2c2049" stroke="#c86cff"/>
+    <text x="1000" y="1043" class="omega">Ω-9 Economics Engine</text><text x="1000" y="1068" class="small">Quality × latency × cost</text>
+
+    <rect x="1280" y="1014" width="240" height="78" rx="16" fill="#352044" stroke="#f06dcf"/>
+    <text x="1300" y="1043" class="omega">Ω-10 Observatory</text><text x="1300" y="1068" class="small">Pricing, uptime, model drift</text>
+  </g>
+
+  <rect x="80" y="1115" width="1440" height="54" rx="18" fill="#11182d" stroke="url(#accent)" stroke-width="2"/>
+  <text x="105" y="1149" class="principle">Evidence over assumptions</text>
+  <text x="410" y="1149" class="principle">Provider independence</text>
+  <text x="710" y="1149" class="principle">Optimization by policy</text>
+  <text x="985" y="1149" class="principle">Extensibility by design</text>
+  <text x="1260" y="1149" class="principle">Human-governed autonomy</text>
+</svg>
