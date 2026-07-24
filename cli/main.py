@@ -458,6 +458,8 @@ def _collect_release_checks() -> dict[str, bool]:
         decision_canonicalization = prov_gate["decision_canonicalization"]
         decision_digest_verification = prov_gate["decision_digest_verification"]
         decision_signature_verification = prov_gate["decision_signature_verification"]
+        decision_ed25519_verification = prov_gate["decision_ed25519_verification"]
+        decision_append_only_persistence = prov_gate["decision_append_only_persistence"]
         decision_chain_integrity = prov_gate["decision_chain_integrity"]
         decision_sequence_validation = prov_gate["decision_sequence_validation"]
         decision_duplicate_rejection = prov_gate["decision_duplicate_rejection"]
@@ -468,6 +470,8 @@ def _collect_release_checks() -> dict[str, bool]:
         decision_canonicalization = False
         decision_digest_verification = False
         decision_signature_verification = False
+        decision_ed25519_verification = False
+        decision_append_only_persistence = False
         decision_chain_integrity = False
         decision_sequence_validation = False
         decision_duplicate_rejection = False
@@ -494,6 +498,8 @@ def _collect_release_checks() -> dict[str, bool]:
         "decision_canonicalization": decision_canonicalization,
         "decision_digest_verification": decision_digest_verification,
         "decision_signature_verification": decision_signature_verification,
+        "decision_ed25519_verification": decision_ed25519_verification,
+        "decision_append_only_persistence": decision_append_only_persistence,
         "decision_chain_integrity": decision_chain_integrity,
         "decision_sequence_validation": decision_sequence_validation,
         "decision_duplicate_rejection": decision_duplicate_rejection,

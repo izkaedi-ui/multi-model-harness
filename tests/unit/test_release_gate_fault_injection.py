@@ -46,6 +46,8 @@ class TestReleaseGateFaultInjectionMatrix(unittest.TestCase):
             "decision_canonicalization": True,
             "decision_digest_verification": True,
             "decision_signature_verification": False,  # Fault injected!
+            "decision_ed25519_verification": True,
+            "decision_append_only_persistence": True,
             "decision_chain_integrity": True,
             "decision_sequence_validation": True,
             "decision_duplicate_rejection": True,
@@ -58,6 +60,50 @@ class TestReleaseGateFaultInjectionMatrix(unittest.TestCase):
         data = json.loads(result.output.strip())
         self.assertEqual(data["verdict"], "failed")
         self.assertFalse(data["checks"]["decision_signature_verification"])
+
+    @patch(
+        "security.decision_provenance.assert_decision_provenance_gate",
+        return_value={
+            "decision_schema_validation": True,
+            "decision_canonicalization": True,
+            "decision_digest_verification": True,
+            "decision_signature_verification": True,
+            "decision_ed25519_verification": False,  # Fault injected!
+            "decision_append_only_persistence": True,
+            "decision_chain_integrity": True,
+            "decision_sequence_validation": True,
+            "decision_duplicate_rejection": True,
+            "decision_sensitive_field_exclusion": True,
+        },
+    )
+    def test_fault_injection_ed25519_verification_fails_release(self, _mock_prov) -> None:
+        result = self.runner.invoke(cli, ["release-check", "--format", "json", "--strict"])
+        self.assertEqual(result.exit_code, 1)
+        data = json.loads(result.output.strip())
+        self.assertEqual(data["verdict"], "failed")
+        self.assertFalse(data["checks"]["decision_ed25519_verification"])
+
+    @patch(
+        "security.decision_provenance.assert_decision_provenance_gate",
+        return_value={
+            "decision_schema_validation": True,
+            "decision_canonicalization": True,
+            "decision_digest_verification": True,
+            "decision_signature_verification": True,
+            "decision_ed25519_verification": True,
+            "decision_append_only_persistence": False,  # Fault injected!
+            "decision_chain_integrity": True,
+            "decision_sequence_validation": True,
+            "decision_duplicate_rejection": True,
+            "decision_sensitive_field_exclusion": True,
+        },
+    )
+    def test_fault_injection_append_only_persistence_fails_release(self, _mock_prov) -> None:
+        result = self.runner.invoke(cli, ["release-check", "--format", "json", "--strict"])
+        self.assertEqual(result.exit_code, 1)
+        data = json.loads(result.output.strip())
+        self.assertEqual(data["verdict"], "failed")
+        self.assertFalse(data["checks"]["decision_append_only_persistence"])
 
     @patch(
         "security.decision_provenance.assert_decision_provenance_gate",
