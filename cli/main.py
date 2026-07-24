@@ -122,9 +122,17 @@ def doctor() -> None:
 
     # 1. API Keys
     click.echo("\nChecking Provider Credentials:")
+    missing_count = 0
+    present_count = 0
     for prov, key_var in [("openai", "OPENAI_API_KEY"), ("anthropic", "ANTHROPIC_API_KEY"),
                            ("google", ["GOOGLE_API_KEY", "GEMINI_API_KEY"]), ("xai", "XAI_API_KEY")]:
-        status = "[OK] Key Present" if has_api_key(key_var) else "[MISSING] Key Not Set"
+        is_set = has_api_key(key_var)
+        if is_set:
+            present_count += 1
+            status = "[OK] Key Present"
+        else:
+            missing_count += 1
+            status = "[MISSING] Key Not Set"
         click.echo(f"  - Provider {prov:<10}: {status}")
 
     # 2. Database Health
@@ -152,7 +160,15 @@ def doctor() -> None:
     except Exception as e:
         click.echo(f"  - Model Registry   : [ERROR] {e}")
 
-    click.echo("\n[OK] Health Check Complete.")
+    click.echo("\n-------------------------------------------")
+    if missing_count == 0:
+        click.echo("STATUS: [HEALTHY] All provider credentials set.")
+    elif present_count > 0:
+        click.echo(f"STATUS: [DEGRADED] {present_count} providers available, {missing_count} missing credentials.")
+    else:
+        click.echo("STATUS: [UNHEALTHY] No provider API keys found.")
+        sys.exit(1)
+
 
 
 @cli.command()

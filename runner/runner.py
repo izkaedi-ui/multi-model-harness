@@ -287,6 +287,11 @@ class Runner:
                             "INSERT OR IGNORE INTO models (id, provider_id, model_name) VALUES (?, ?, ?)",
                             (r.model, r.provider, r.model)
                         )
+                        cost = estimate_cost_usd(
+                            model=r.model,
+                            input_tokens=r.usage.input_tokens,
+                            output_tokens=r.usage.output_tokens,
+                        )
                         # Ensure execution exists
                         await repo.save_execution(
                             execution_id=exec_id,
@@ -298,7 +303,9 @@ class Runner:
                             input_tokens=r.usage.input_tokens,
                             output_tokens=r.usage.output_tokens,
                             finish_reason=r.finish_reason,
+                            estimated_cost_usd=cost,
                         )
+
 
                     for s in all_scores:
                         await repo.save_scores([s])
