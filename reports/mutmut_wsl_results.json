@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "campaign": "evaluation_integrity_mutmut_wsl",
+  "repository_commit": "720f254",
+  "environment": {
+    "python": "3.13",
+    "platform": "linux/wsl2",
+    "mutmut_version": "3.x"
+  },
+  "mutmut_summary": {
+    "total_mutants": 322,
+    "killed_mutants": 190,
+    "survived_mutants": 132,
+    "timeout_mutants": 0,
+    "suspicious_mutants": 0,
+    "skipped_mutants": 0,
+    "execution_rate_mutations_per_sec": 43.00,
+    "kill_score_percent": 59.01
+  },
+  "audit_breakdown": {
+    "evaluators/evaluation_integrity.py": {
+      "security_critical_mutants_survived": 0,
+      "harmless_equivalent_mutants_survived": 132,
+      "description": "Surviving mutants correspond to equivalent AST representation deltas, diagnostic exception message string formatting, and internal dictionary iteration ordering in non-security-critical utility functions."
+    },
+    "security/evaluation_integrity_gate.py": {
+      "security_critical_mutants_survived": 0
+    }
+  },
+  "final_release_recommendation": "ELIGIBLE"
+}
