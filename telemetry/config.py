@@ -27,25 +27,30 @@ class TelemetryConfig:
 
 
 def load_telemetry_config(
-    values: Mapping[str, object] | None,
+    values: Mapping[str, object] | None = None,
 ) -> TelemetryConfig:
-    if not values:
-        return TelemetryConfig()
+    import os
+
+    vals = dict(values) if values else {}
+
+    enabled = bool(vals.get("enabled", os.getenv("HARNESS_TELEMETRY_ENABLED", "0") in ("1", "true", "TRUE")))
+    metrics_enabled = bool(vals.get("metrics_enabled", os.getenv("HARNESS_METRICS_ENABLED", "0") in ("1", "true", "TRUE")))
 
     return TelemetryConfig(
-        enabled=bool(values.get("enabled", False)),
+        enabled=enabled,
         service_name=str(
-            values.get("service_name", "multi-model-harness")
+            vals.get("service_name", "multi-model-harness")
         ),
-        service_version=str(values.get("service_version", "unknown")),
+        service_version=str(vals.get("service_version", "unknown")),
         otlp_endpoint=(
-            str(values["otlp_endpoint"])
-            if values.get("otlp_endpoint")
+            str(vals["otlp_endpoint"])
+            if vals.get("otlp_endpoint")
             else None
         ),
-        metrics_enabled=bool(values.get("metrics_enabled", False)),
-        traces_enabled=bool(values.get("traces_enabled", False)),
+        metrics_enabled=metrics_enabled,
+        traces_enabled=bool(vals.get("traces_enabled", False)),
         export_interval_seconds=float(
-            values.get("export_interval_seconds", 15.0)
+            vals.get("export_interval_seconds", 15.0)
         ),
     )
+

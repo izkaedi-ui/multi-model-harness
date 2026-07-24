@@ -107,9 +107,19 @@ class Runner:
 
         try:
             # Step 1-2: Load config + validate credentials
+            try:
+                from telemetry.config import load_telemetry_config
+                from telemetry.server import MetricsServer
+                t_cfg = load_telemetry_config()
+                if t_cfg.enabled or t_cfg.metrics_enabled:
+                    MetricsServer().start()
+            except Exception:
+                pass
+
             budget_cfg = self._load_budget_config()
             available = available_providers()
             missing = [p for p in self._config.providers if p not in available]
+
 
             if missing and not self._config.allow_partial_providers:
                 log.error("runner.missing_providers", extra={"missing": missing, "available": available})
