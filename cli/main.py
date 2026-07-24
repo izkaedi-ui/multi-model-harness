@@ -377,7 +377,13 @@ def _collect_release_checks() -> dict[str, bool]:
     import pytest
 
     # 1. Compilation
-    comp_ok = bool(compileall.compile_dir(".", quiet=1))
+    try:
+        import re
+        comp_buf = io.StringIO()
+        with contextlib.redirect_stdout(comp_buf), contextlib.redirect_stderr(comp_buf):
+            comp_ok = bool(compileall.compile_dir(".", rx=re.compile(r"[/\\](\.venv|\.git|\.pytest_cache|\.mypy_cache|build|dist)"), quiet=1))
+    except Exception:
+        comp_ok = False
 
     # 2. Pytest Unit Tests
     try:

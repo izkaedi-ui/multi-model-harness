@@ -23,10 +23,17 @@ class TestReleaseGateFaultInjectionMatrix(unittest.TestCase):
     def setUp(self) -> None:
         self.runner = CliRunner()
 
+    def _parse_json(self, output: str) -> dict:
+        s = output.strip()
+        idx = s.find("{")
+        if idx != -1:
+            return json.loads(s[idx:])
+        return json.loads(s)
+
     def test_baseline_clean_release_check_passes(self) -> None:
         result = self.runner.invoke(cli, ["release-check", "--format", "json", "--strict"])
         self.assertEqual(result.exit_code, 0)
-        data = json.loads(result.output.strip())
+        data = self._parse_json(result.output)
         self.assertEqual(data["verdict"], "ready")
         self.assertTrue(data["strict_mode"])
         self.assertTrue(all(data["checks"].values()))
@@ -35,7 +42,7 @@ class TestReleaseGateFaultInjectionMatrix(unittest.TestCase):
     def test_fault_injection_git_dirty_fails_release(self, _mock_git) -> None:
         result = self.runner.invoke(cli, ["release-check", "--format", "json", "--strict"])
         self.assertEqual(result.exit_code, 1)
-        data = json.loads(result.output.strip())
+        data = self._parse_json(result.output)
         self.assertEqual(data["verdict"], "failed")
         self.assertFalse(data["checks"]["git_clean"])
 
@@ -57,7 +64,7 @@ class TestReleaseGateFaultInjectionMatrix(unittest.TestCase):
     def test_fault_injection_wrong_hmac_key_fails_release(self, _mock_prov) -> None:
         result = self.runner.invoke(cli, ["release-check", "--format", "json", "--strict"])
         self.assertEqual(result.exit_code, 1)
-        data = json.loads(result.output.strip())
+        data = self._parse_json(result.output)
         self.assertEqual(data["verdict"], "failed")
         self.assertFalse(data["checks"]["decision_signature_verification"])
 
@@ -79,7 +86,7 @@ class TestReleaseGateFaultInjectionMatrix(unittest.TestCase):
     def test_fault_injection_ed25519_verification_fails_release(self, _mock_prov) -> None:
         result = self.runner.invoke(cli, ["release-check", "--format", "json", "--strict"])
         self.assertEqual(result.exit_code, 1)
-        data = json.loads(result.output.strip())
+        data = self._parse_json(result.output)
         self.assertEqual(data["verdict"], "failed")
         self.assertFalse(data["checks"]["decision_ed25519_verification"])
 
@@ -101,7 +108,7 @@ class TestReleaseGateFaultInjectionMatrix(unittest.TestCase):
     def test_fault_injection_append_only_persistence_fails_release(self, _mock_prov) -> None:
         result = self.runner.invoke(cli, ["release-check", "--format", "json", "--strict"])
         self.assertEqual(result.exit_code, 1)
-        data = json.loads(result.output.strip())
+        data = self._parse_json(result.output)
         self.assertEqual(data["verdict"], "failed")
         self.assertFalse(data["checks"]["decision_append_only_persistence"])
 
@@ -121,7 +128,7 @@ class TestReleaseGateFaultInjectionMatrix(unittest.TestCase):
     def test_fault_injection_mutated_payload_fails_release(self, _mock_prov) -> None:
         result = self.runner.invoke(cli, ["release-check", "--format", "json", "--strict"])
         self.assertEqual(result.exit_code, 1)
-        data = json.loads(result.output.strip())
+        data = self._parse_json(result.output)
         self.assertEqual(data["verdict"], "failed")
         self.assertFalse(data["checks"]["decision_digest_verification"])
 
@@ -141,7 +148,7 @@ class TestReleaseGateFaultInjectionMatrix(unittest.TestCase):
     def test_fault_injection_broken_chain_fails_release(self, _mock_prov) -> None:
         result = self.runner.invoke(cli, ["release-check", "--format", "json", "--strict"])
         self.assertEqual(result.exit_code, 1)
-        data = json.loads(result.output.strip())
+        data = self._parse_json(result.output)
         self.assertEqual(data["verdict"], "failed")
         self.assertFalse(data["checks"]["decision_chain_integrity"])
 
@@ -161,7 +168,7 @@ class TestReleaseGateFaultInjectionMatrix(unittest.TestCase):
     def test_fault_injection_sequence_gap_fails_release(self, _mock_prov) -> None:
         result = self.runner.invoke(cli, ["release-check", "--format", "json", "--strict"])
         self.assertEqual(result.exit_code, 1)
-        data = json.loads(result.output.strip())
+        data = self._parse_json(result.output)
         self.assertEqual(data["verdict"], "failed")
         self.assertFalse(data["checks"]["decision_sequence_validation"])
 
@@ -181,7 +188,7 @@ class TestReleaseGateFaultInjectionMatrix(unittest.TestCase):
     def test_fault_injection_duplicate_id_fails_release(self, _mock_prov) -> None:
         result = self.runner.invoke(cli, ["release-check", "--format", "json", "--strict"])
         self.assertEqual(result.exit_code, 1)
-        data = json.loads(result.output.strip())
+        data = self._parse_json(result.output)
         self.assertEqual(data["verdict"], "failed")
         self.assertFalse(data["checks"]["decision_duplicate_rejection"])
 
@@ -201,7 +208,7 @@ class TestReleaseGateFaultInjectionMatrix(unittest.TestCase):
     def test_fault_injection_sensitive_secret_fails_release(self, _mock_prov) -> None:
         result = self.runner.invoke(cli, ["release-check", "--format", "json", "--strict"])
         self.assertEqual(result.exit_code, 1)
-        data = json.loads(result.output.strip())
+        data = self._parse_json(result.output)
         self.assertEqual(data["verdict"], "failed")
         self.assertFalse(data["checks"]["decision_sensitive_field_exclusion"])
 
@@ -221,7 +228,7 @@ class TestReleaseGateFaultInjectionMatrix(unittest.TestCase):
     def test_fault_injection_unsupported_schema_fails_release(self, _mock_prov) -> None:
         result = self.runner.invoke(cli, ["release-check", "--format", "json", "--strict"])
         self.assertEqual(result.exit_code, 1)
-        data = json.loads(result.output.strip())
+        data = self._parse_json(result.output)
         self.assertEqual(data["verdict"], "failed")
         self.assertFalse(data["checks"]["decision_schema_validation"])
 
@@ -232,7 +239,7 @@ class TestReleaseGateFaultInjectionMatrix(unittest.TestCase):
     def test_fault_injection_object_authorization_fails_release(self, _mock_auth) -> None:
         result = self.runner.invoke(cli, ["release-check", "--format", "json", "--strict"])
         self.assertEqual(result.exit_code, 1)
-        data = json.loads(result.output.strip())
+        data = self._parse_json(result.output)
         self.assertEqual(data["verdict"], "failed")
         self.assertFalse(data["checks"]["object_authorization"])
 
@@ -247,6 +254,6 @@ class TestReleaseGateFaultInjectionMatrix(unittest.TestCase):
     def test_fault_injection_evaluator_isolation_fails_release(self, _mock_sandbox) -> None:
         result = self.runner.invoke(cli, ["release-check", "--format", "json", "--strict"])
         self.assertEqual(result.exit_code, 1)
-        data = json.loads(result.output.strip())
+        data = self._parse_json(result.output)
         self.assertEqual(data["verdict"], "failed")
         self.assertFalse(data["checks"]["evaluator_subprocess_isolation"])
