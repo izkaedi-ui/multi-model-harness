@@ -4,9 +4,27 @@
 
 ---
 
-## 🏛️ The Five Engineering Guarantees
+## 🎯 Project Mission & Charter
 
-| Guarantee | Verification Question | Evidence Artifact | Status |
+Build a trustworthy AI evaluation platform whose conclusions are supported by evidence rather than assumptions. Every core property of the platform must be expressed as an **engineering guarantee** and verified through automated tests, reproducible evidence artifacts, and machine release gates.
+
+### 📐 Foundational Engineering Principles
+
+1. 📊 **Measure before concluding**: Every score is grounded in raw data, confidence intervals, and judge agreement.
+2. 🔄 **Reproduce before comparing**: No evaluation is valid without a matching signed replay manifest and environment fingerprint.
+3. 📉 **Detect change before reacting**: Statistically significant model drift must be detected and documented over time.
+4. 🔌 **Verify extensions before trusting them**: Dynamic plugins must pass metadata verification and credential boundary isolation.
+5. 🔒 **Observe systems without exposing sensitive data**: Telemetry scrubbers guarantee zero prompt or secret leakage across logs, traces, and metrics.
+
+---
+
+## 🏛️ The Five Guarantees Proof Pipeline
+
+```text
+Engineering Guarantee  ──▶  Verification  ──▶  Evidence Artifact  ──▶  Release Gate
+```
+
+| Guarantee | Verification Question | Required Evidence Artifact | Status |
 | :--- | :--- | :--- | :--- |
 | ⚖️ **Evaluation Integrity** | *Can the evaluation be manipulated?* | Adversarial benchmark suite & judge-resistance report | `v0.6.0` (Active) |
 | 🔄 **Reproducibility** | *Can this result be reproduced?* | Signed replay manifest & environment fingerprint | `v0.6.1` (Active) |
@@ -24,6 +42,7 @@
 | Anthropic | `AnthropicAdapter` | ✅ Native Implementation |
 | Google Gemini | `GeminiAdapter` | ✅ Native Implementation |
 | xAI / Grok | `XAIAdapter` | ✅ Native Implementation |
+
 
 
 ## Evaluation Categories
