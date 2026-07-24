@@ -71,15 +71,16 @@ google:
 
 
 xai:
-  grok-2-latest:
+  grok-4.3:
     provider: xai
-    context_limit: 131072
-    max_output_tokens: 4096
+    context_limit: 1000000
+    max_output_tokens: 8192
     default_temperature: 0.0
     supports_tools: true
     supports_system_messages: true
-    supports_json_schema: false
+    supports_json_schema: true
     pricing:
-      input_per_million: 2.00
-      output_per_million: 10.00
+      input_per_million: 1.25
+      output_per_million: 2.50
+
 
