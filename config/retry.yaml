@@ -27,9 +27,10 @@ non_retryable_status_codes:
   - 422  # Unprocessable Entity — schema validation failure
 
 # Timing
-max_attempts: 3
-base_delay_seconds: 1.0
-max_delay_seconds: 20.0
+max_attempts: 2
+base_delay_seconds: 0.5
+max_delay_seconds: 5.0
+
 # Backoff multiplier applied each attempt: delay = min(base * multiplier^n, max)
 backoff_multiplier: 2.0
 # Maximum random jitter added to each delay (seconds)
