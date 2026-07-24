@@ -1,0 +1,30 @@
+{
+  "HTTP_400": {
+    "category": "NonRetryableProviderError",
+    "retry": false
+  },
+  "HTTP_401": {
+    "category": "AuthenticationError",
+    "retry": false
+  },
+  "HTTP_403": {
+    "category": "AuthenticationError",
+    "retry": false
+  },
+  "HTTP_404": {
+    "category": "ModelNotFoundError",
+    "retry": false
+  },
+  "HTTP_429": {
+    "category": "RateLimitError",
+    "retry": true
+  },
+  "HTTP_500": {
+    "category": "RetryableProviderError",
+    "retry": true
+  },
+  "HTTP_503": {
+    "category": "RetryableProviderError",
+    "retry": true
+  }
+}

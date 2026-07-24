@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0.0",
+  "candidate_commit": "d88518c",
+  "decision": "ELIGIBLE",
+  "critical_invariants": {
+    "total": 8,
+    "tested": 8,
+    "passing": 8
+  },
+  "tests": {
+    "total": 247,
+    "passed": 247,
+    "failed": 0,
+    "skipped": 0
+  },
+  "mutation_testing": {
+    "critical_survivors": 0,
+    "high_risk_survivors": 0
+  },
+  "confirmed_defects": [],
+  "unresolved_risks": [],
+  "blocking_reasons": []
+}
