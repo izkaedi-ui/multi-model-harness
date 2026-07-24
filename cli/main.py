@@ -170,9 +170,31 @@ def doctor() -> None:
         sys.exit(1)
 
 
+@cli.command()
+@click.option("--host", default="127.0.0.1", help="Host address to bind metrics server to")
+@click.option("--port", default=9464, type=int, help="Port to expose Prometheus metrics on")
+def serve_metrics(host: str, port: int) -> None:
+    """Start a persistent Prometheus metrics HTTP server daemon."""
+    import time
+    from telemetry.server import MetricsServer
+
+    server = MetricsServer(port=port, address=host)
+    if server.start():
+        click.echo(f"Prometheus metrics server running at http://{host}:{port}/metrics")
+        click.echo("Press Ctrl+C to stop.")
+        try:
+            while True:
+                time.sleep(1.0)
+        except KeyboardInterrupt:
+            click.echo("\nMetrics server stopped.")
+    else:
+        click.echo(f"[ERROR] Failed to start metrics server on http://{host}:{port}/metrics")
+        sys.exit(1)
+
 
 @cli.command()
 def discover_models() -> None:
+
     """Discover available models from configured provider endpoints."""
     from adapters.auth import has_api_key
     import os
