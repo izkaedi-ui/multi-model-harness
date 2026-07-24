@@ -70,8 +70,9 @@
       <div class="metric"><div class="v" style="color:#5fb6ff">48+</div><div class="l">CAPABILITIES</div></div>
       <div class="metric"><div class="v" style="color:#68f0db">20</div><div class="l">MAJOR DOMAINS</div></div>
       <div class="metric"><div class="v" style="color:#61f1a4">100%</div><div class="l">CORE STABILITY</div></div>
-      <div class="metric"><div class="v" style="color:#d978ff">v0.5.0</div><div class="l">CURRENT RELEASE</div></div>
+      <div class="metric"><div class="v" style="color:#d978ff">v0.6.0</div><div class="l">CURRENT RELEASE</div></div>
       <div class="metric"><div class="v" style="color:#72f29a">READY</div><div class="l">RELEASE GATE</div></div>
+
     </section>
     <section class="card mission"><b>MISSION</b><p>Build the most robust, scientific, extensible multi-model evaluation platform possible—without sacrificing reproducibility, cost discipline, or operational truth.</p></section>
   </div>
@@ -389,11 +390,12 @@ document.getElementById("breakdown").innerHTML=breakdown.map(x=>`<div class="row
 
 const heat=document.getElementById("heat");for(let c=0;c<8;c++){const col=document.createElement("div");col.className="heatcol";for(let i=0;i<18;i++){const s=document.createElement("div");s.className=`sq ${i<10+c?"on"+((c%5)+1):""}`;col.appendChild(s)}heat.appendChild(col)}
 
-const road=[["v0.4.x","FOUNDATION COMPLETE","Core Platform","Provider Plugins","Benchmark DSL","Release Gate"],["v0.5.x","SCIENTIFIC CORE COMPLETE","Judge Ensembles","Statistics Engine","Replay Manifests"],["v0.6.x","PLATFORM PLANNED","OTel","Distributed Exec","REST API"],["v1.0.x","INTELLIGENCE FUTURE","Routing","Pareto","Cost Intelligence"],["v2.0+","AUTONOMY VISION","Auto Research","AI Observatory","Full Autonomy"]];
+const road=[["v0.4.x","FOUNDATION COMPLETE","Core Platform","Provider Plugins","Benchmark DSL","Release Gate"],["v0.5.x","SCIENTIFIC CORE COMPLETE","Judge Ensembles","Statistics Engine","Replay Manifests"],["v0.6.x","OBSERVABILITY COMPLETE","OpenTelemetry","Prometheus Metrics","Grafana Dashboards"],["v1.0.x","INTELLIGENCE FUTURE","Routing","Pareto","Cost Intelligence"],["v2.0+","AUTONOMY VISION","Auto Research","AI Observatory","Full Autonomy"]];
 document.getElementById("road").innerHTML=road.map(x=>`<div class="stage"><h4>${x[0]}</h4><p style="color:#71f2a7">${x[1]}</p>${x.slice(2).map(y=>`<p>• ${y}</p>`).join("")}</div>`).join("");
 
-const status=[["SYSTEM HEALTH","100%","All Systems Operational"],["TEST SUITE","62/62","Passing"],["RELEASE GATE","READY","All Checks Passed"],["COST GUARD","ACTIVE","Within Budget"],["DATABASE","Healthy","SQLite"],["PROVIDERS","4/4","Online"],["MODELS","12+","Discovered"],["RUNS TODAY","0","Executed"]];
+const status=[["SYSTEM HEALTH","100%","All Systems Operational"],["TEST SUITE","69/69","Passing"],["RELEASE GATE","READY","All Checks Passed"],["COST GUARD","ACTIVE","Within Budget"],["DATABASE","Healthy","SQLite"],["PROVIDERS","4/4","Online"],["MODELS","12+","Discovered"],["RUNS TODAY","0","Executed"]];
 document.getElementById("status").innerHTML=status.map(x=>`<div class="s"><div class="sl">${x[0]}</div><div class="sv">${x[1]}</div><div class="sl">${x[2]}</div></div>`).join("");
+
 
 
 function polar(cx,cy,r,a){const rad=(a-90)*Math.PI/180;return [cx+r*Math.cos(rad),cy+r*Math.sin(rad)]}
