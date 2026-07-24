@@ -6,28 +6,31 @@ This document serves as the authoritative, end-to-end architectural blueprint, e
 
 ---
 
-## 🏛️ Part I — The Five Omega Core Principles
+## 🏛️ Part I — The Five Omega Core Principles & Universal Evaluation Directive
+
+> **Universal Platform Evaluation Directive**:  
+> *"Every new feature should either make the platform more **extensible**, more **reproducible**, more **observable**, or more **autonomous**."*
 
 Every past, present, and future commit to this repository is bound by five foundational design invariants:
 
-1. 📊 **Evidence Over Assumptions (Forensic Correctness)**:
+1. 📊 **Evidence Over Assumptions (Forensic Correctness & Reproducibility)**:
    - Every metric, latency claim, cost calculation, and pass/fail verdict MUST be backed by raw, un-truncated execution data stored in `harness.db` and reproducible via `manifest_<run_id>.json`.
    - Hardcoded success claims, unverified mock test passes, or swallowed exceptions are strictly prohibited.
 
-2. 🔄 **Provider Identity Preservation & Independence**:
-   - Models and vendors remain strictly modular behind unified provider interfaces (`OpenAIAdapter`, `AnthropicAdapter`, `GeminiAdapter`, `XAIAdapter`, and local runtimes).
+2. 🔄 **Provider Identity Preservation & Extensibility**:
+   - Models and vendors remain strictly modular behind unified provider interfaces (`OpenAIAdapter`, `AnthropicAdapter`, `GeminiAdapter`, `XAIAdapter`, and dynamic entry-point plugins).
    - Error mapping and normalization logic MUST preserve the underlying subclass identity (e.g. exceptions from xAI endpoints MUST emit `provider='xai'` instead of defaulting to `openai`).
 
-3. ⚖️ **Multi-Objective Policy Optimization**:
+3. ⚖️ **Multi-Objective Policy Optimization & Cost Intelligence**:
    - Execution routing, model selection, and concurrency are dynamically balanced across four competing variables: **Quality Score**, **Latency (P50/P95)**, **Cost (USD)**, and **Reliability (Retry Rate)**.
    - Dynamic scheduling selects the lowest-cost model capable of satisfying a given benchmark's capability threshold.
 
-4. 🧩 **Extensibility & Loose Coupling by Design**:
-   - All new provider adapters, evaluation metrics, dataset readers, and report exporters MUST arrive as isolated plugins or interface implementations without altering the core execution pipeline in `runner/runner.py`.
+4. 👁️ **Full Observability & Metric Rigor**:
+   - Every pipeline run captures structured logs, OpenTelemetry context traces, latency percentiles, and execution manifests for 100% operational transparency.
 
-5. 🛡️ **Human-Governed Autonomy**:
+5. 🛡️ **Human-Governed Autonomy & Self-Improvement**:
    - The system continuously automates background model discovery, health checks, benchmarking, and cost optimization.
-   - High-impact operational changes (production deployments, git merges, model deprecation overrides) remain subject to explicit human review.
+   - High-impact operational changes (production deployments, git merges, model deprecation overrides) remain subject to explicit human review while enabling autonomous benchmark evolution.
 
 ---
 
