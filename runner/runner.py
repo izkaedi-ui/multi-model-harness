@@ -44,7 +44,11 @@ from runner.retry_manager import RetryManager
 from runner.scorer import Scorer
 from runner.verdict_engine import VerdictEngine
 from security_harness.correlation import generate_run_id, set_current_correlation_id
-from security_harness.errors import BudgetExceeded, GlobalBudgetExceeded
+from security_harness.errors import (
+    BudgetExceeded,
+    GlobalBudgetExceeded,
+    MissingApiKeyError,
+)
 from security_harness.types import ExecutionStatus, ModelResponse, RunStatus, TestCase
 
 log = logging.getLogger(__name__)

@@ -35,8 +35,21 @@ def run(providers: str, categories: str, max_cases: int, dry_run: bool, allow_pa
     """Execute a security test run across configured providers."""
     from runner.runner import RunConfig, Runner
 
-    prov_list = [p.strip() for p in providers.split(",") if p.strip()]
-    cat_list = [c.strip() for c in categories.split(",") if c.strip()]
+    provider_aliases = {
+        "gemini": "google",
+    }
+
+    prov_list = [
+        provider_aliases.get(provider.strip().lower(), provider.strip().lower())
+        for provider in providers.split(",")
+        if provider.strip()
+    ]
+
+    cat_list = [
+        category.strip()
+        for category in categories.split(",")
+        if category.strip()
+    ]
 
     config = RunConfig(
         providers=prov_list,
