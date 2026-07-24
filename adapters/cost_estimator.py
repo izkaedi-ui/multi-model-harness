@@ -53,11 +53,15 @@ def estimate_cost_usd(
     pricing = _load_pricing()
     model_pricing = pricing.get(model, {})
     if not model_pricing:
-        # Fallback to model prefix matching (e.g. gpt-4o-2024-08-06 -> gpt-4o)
-        for registered_name, meta in pricing.items():
-            if model.startswith(registered_name) or registered_name.startswith(model.split("-")[0]):
-                model_pricing = meta
-                break
+        # Longest-prefix matching (e.g. gpt-4o-mini-2024-07-18 matches gpt-4o-mini, not gpt-4o)
+        matching_keys = sorted(
+            [k for k in pricing.keys() if model.startswith(k)],
+            key=len,
+            reverse=True,
+        )
+        if matching_keys:
+            model_pricing = pricing[matching_keys[0]]
+
 
     input_per_million = model_pricing.get("input_per_million", 0.0)
     output_per_million = model_pricing.get("output_per_million", 0.0)

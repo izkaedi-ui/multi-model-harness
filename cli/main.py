@@ -259,8 +259,70 @@ def optimize() -> None:
         click.echo(f"[ERROR] Optimization failed: {e}")
 
 
+@cli.command()
+@click.option("--dry-run", is_flag=True, help="Preview backfill changes without modifying harness.db")
+def backfill_costs(dry_run: bool) -> None:
+    """Recalculate and persist execution costs in harness.db using longest-prefix model pricing."""
+    from adapters.cost_estimator import estimate_cost_usd, _load_pricing
+    import adapters.cost_estimator
+    import sqlite3
+
+    adapters.cost_estimator._PRICING_CACHE = None  # Refresh pricing cache
+    click.echo(f"--- Recalculating Historical Execution Costs (dry_run={dry_run}) ---")
+
+    try:
+        conn = sqlite3.connect("harness.db")
+        cursor = conn.execute("""
+            SELECT e.id, m.model_name, e.input_tokens, e.output_tokens, e.estimated_cost_usd
+            FROM executions e
+            JOIN models m ON m.id = e.model_id
+            WHERE e.status = 'completed'
+        """)
+        rows = cursor.fetchall()
+
+        if not rows:
+            click.echo("No completed execution records found.")
+            conn.close()
+            return
+
+        updated_count = 0
+        unknown_models: set[str] = set()
+        old_total = 0.0
+        new_total = 0.0
+
+        for exec_id, model_name, in_tok, out_tok, current_cost in rows:
+            new_cost = estimate_cost_usd(model_name, in_tok, out_tok)
+            old_total += current_cost
+            new_total += new_cost
+            if current_cost != new_cost:
+                updated_count += 1
+                if new_cost == 0.0:
+                    unknown_models.add(model_name)
+                if not dry_run:
+                    conn.execute("UPDATE executions SET estimated_cost_usd = ? WHERE id = ?", (new_cost, exec_id))
+
+        if not dry_run:
+            conn.commit()
+        conn.close()
+
+        mode_str = "[DRY-RUN PREVIEW]" if dry_run else "[COMMITTED]"
+        click.echo(f"{mode_str} Evaluated {len(rows)} execution records.")
+        click.echo(f"  - Rows modified       : {updated_count}")
+        click.echo(f"  - Previous Cost Total : ${old_total:.4f} USD")
+        click.echo(f"  - New Cost Total      : ${new_total:.4f} USD")
+
+        if unknown_models:
+            click.echo(f"  - [WARN] Models with $0.00 pricing (unmatched): {list(unknown_models)}")
+        else:
+            click.echo("  - [OK] All models successfully matched to pricing registry.")
+
+    except Exception as e:
+        click.echo(f"[ERROR] Backfill failed: {e}")
+
+
 if __name__ == "__main__":
     cli()
+
 
 
 
