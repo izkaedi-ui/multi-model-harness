@@ -321,85 +321,114 @@ def backfill_costs(dry_run: bool) -> None:
 
 
 @cli.command()
-def release_check() -> None:
+@click.option("--format", "fmt", default="text", type=click.Choice(["text", "json"]), help="Output format (text or json)")
+@click.option("--strict", is_flag=True, help="Strict mode: fail non-zero if any warnings exist")
+def release_check(fmt: str, strict: bool) -> None:
     """Run comprehensive automated verification suite to validate release readiness."""
     import compileall
     import subprocess
     import sqlite3
 
-    click.echo("===========================================")
-    click.echo(" Multi-Provider Harness Release Readiness ")
-    click.echo("===========================================\n")
+    if fmt == "text":
+        click.echo("===========================================")
+        click.echo(" Multi-Provider Harness Release Readiness ")
+        click.echo("===========================================\n")
 
     results: dict[str, bool] = {}
 
     # 1. Compilation
-    click.echo("1. Checking Source Compilation...")
     comp_ok = compileall.compile_dir(".", quiet=1)
-    results["Compilation"] = bool(comp_ok)
-    click.echo(f"   -> Compilation: {'PASS' if comp_ok else 'FAIL'}")
+    results["compilation"] = bool(comp_ok)
+    if fmt == "text":
+        click.echo("1. Checking Source Compilation...")
+        click.echo(f"   -> Compilation: {'PASS' if comp_ok else 'FAIL'}")
 
     # 2. Pytest Unit Tests
-    click.echo("2. Running Unit Test Suite...")
     try:
         res = subprocess.run([sys.executable, "-m", "pytest", "-q"], capture_output=True, text=True, check=True)
-        results["Unit Tests"] = True
-        click.echo("   -> Unit Tests: PASS (16 passed)")
+        results["unit_tests"] = True
+        if fmt == "text":
+            click.echo("2. Running Unit Test Suite...")
+            click.echo("   -> Unit Tests: PASS (16 passed)")
     except Exception as e:
-        results["Unit Tests"] = False
-        click.echo(f"   -> Unit Tests: FAIL ({e})")
+        results["unit_tests"] = False
+        if fmt == "text":
+            click.echo("2. Running Unit Test Suite...")
+            click.echo(f"   -> Unit Tests: FAIL ({e})")
 
     # 3. YAML Configuration Validation
-    click.echo("3. Validating Configuration and Scenarios...")
     try:
         res = subprocess.run([sys.executable, "-m", "cli.main", "validate"], capture_output=True, text=True, check=True)
-        results["Validation"] = True
-        click.echo("   -> Validation: PASS")
+        results["validation"] = True
+        if fmt == "text":
+            click.echo("3. Validating Configuration and Scenarios...")
+            click.echo("   -> Validation: PASS")
     except Exception as e:
-        results["Validation"] = False
-        click.echo(f"   -> Validation: FAIL ({e})")
+        results["validation"] = False
+        if fmt == "text":
+            click.echo("3. Validating Configuration and Scenarios...")
+            click.echo(f"   -> Validation: FAIL ({e})")
 
     # 4. SQLite Database Integrity
-    click.echo("4. Checking SQLite Database & Schema Integrity...")
     try:
         conn = sqlite3.connect("harness.db")
         integrity = conn.execute("PRAGMA integrity_check").fetchone()[0]
         fk_check = conn.execute("PRAGMA foreign_key_check").fetchall()
         conn.close()
         db_ok = (integrity == "ok" and not fk_check)
-        results["Database Integrity"] = db_ok
-        click.echo(f"   -> Database Integrity: {'PASS' if db_ok else 'FAIL'}")
+        results["database_integrity"] = db_ok
+        if fmt == "text":
+            click.echo("4. Checking SQLite Database & Schema Integrity...")
+            click.echo(f"   -> Database Integrity: {'PASS' if db_ok else 'FAIL'}")
     except Exception as e:
-        results["Database Integrity"] = False
-        click.echo(f"   -> Database Integrity: FAIL ({e})")
+        results["database_integrity"] = False
+        if fmt == "text":
+            click.echo("4. Checking SQLite Database & Schema Integrity...")
+            click.echo(f"   -> Database Integrity: FAIL ({e})")
 
     # 5. Git Status Check
-    click.echo("5. Checking Git Working Tree Status...")
     try:
         res = subprocess.run(["git", "status", "--short"], capture_output=True, text=True, check=True)
         clean = (res.stdout.strip() == "")
-        results["Git Clean"] = clean
-        status_msg = "PASS (Clean)" if clean else "WARN (Uncommitted changes)"
-        click.echo(f"   -> Git Working Tree: {status_msg}")
+        results["git_clean"] = clean
+        if fmt == "text":
+            click.echo("5. Checking Git Working Tree Status...")
+            status_msg = "PASS (Clean)" if clean else "WARN (Uncommitted changes)"
+            click.echo(f"   -> Git Working Tree: {status_msg}")
     except Exception as e:
-        results["Git Clean"] = False
-        click.echo(f"   -> Git Working Tree: FAIL ({e})")
-
-    click.echo("\n===========================================")
-    click.echo(" Release Gate Summary ")
-    click.echo("===========================================")
-    for gate, status in results.items():
-        click.echo(f"{gate:<25} : {'PASS' if status else 'FAIL/WARN'}")
+        results["git_clean"] = False
+        if fmt == "text":
+            click.echo("5. Checking Git Working Tree Status...")
+            click.echo(f"   -> Git Working Tree: FAIL ({e})")
 
     all_passed = all(results.values())
-    click.echo("\nVERDICT: " + ("READY FOR RELEASE [OK]" if all_passed else "ATTENTION REQUIRED [WARN]"))
-    if not all_passed:
-        sys.exit(1)
+    verdict_str = "ready" if all_passed else ("failed" if strict else "warning")
 
+    if fmt == "json":
+        payload = {
+            "verdict": verdict_str,
+            "strict_mode": strict,
+            "checks": results
+        }
+        click.echo(json.dumps(payload, indent=2))
+    else:
+        click.echo("\n===========================================")
+        click.echo(" Release Gate Summary ")
+        click.echo("===========================================")
+        for gate, status in results.items():
+            click.echo(f"{gate:<25} : {'PASS' if status else 'FAIL/WARN'}")
+
+        click.echo("\nVERDICT: " + ("READY FOR RELEASE [OK]" if all_passed else "ATTENTION REQUIRED [WARN]"))
+
+    if strict and not all_passed:
+        sys.exit(1)
+    elif not results["compilation"] or not results["unit_tests"] or not results["validation"] or not results["database_integrity"]:
+        sys.exit(1)
 
 
 if __name__ == "__main__":
     cli()
+
 
 
 
