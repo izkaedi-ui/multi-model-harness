@@ -1,17 +1,17 @@
 # security/decision_provenance.py
 
 """
-Decision Provenance Engine — Level 1-4 Cryptographic Audit Chain.
+Decision Provenance Engine — HMAC-Authenticated Chained Provenance Prototype (Level 1-3).
 
 Formalizes the invariant:
   "Every decision that crosses a trust boundary should be deterministic, least-privileged,
    auditable, and backed by verifiable evidence."
 
 Security Architecture:
-  Level 1 — Canonical Payload Integrity (RFC 8785 JSON canonicalization + SHA-256)
-  Level 2 — Authenticity (Cryptographic HMAC / Signature verification)
+  Level 1 — Canonical Payload Integrity (HARNESS-JSON-SORTED-COMPACT-v1 + SHA-256)
+  Level 2 — Authenticity (Cryptographic HMAC-SHA256 verification with injected signing keys)
   Level 3 — Historical Chaining (previous_record_digest + stream_sequence link)
-  Level 4 — Transparency & Tamper-Evident Chain Validation
+  (Level 4 Transparency log & Ed25519 public key verification pending external anchoring)
 """
 
 from __future__ import annotations
@@ -20,13 +20,13 @@ import hmac
 import hashlib
 import json
 import re
+import secrets
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Any, Sequence
 
 SCHEMA_VERSION = "1.0.0"
-CANONICALIZATION_VERSION = "RFC8785-v1"
-DEFAULT_SIGNING_KEY = b"harness-provenance-master-key-v1"
+CANONICALIZATION_VERSION = "HARNESS-JSON-SORTED-COMPACT-v1"
 
 SECRET_PATTERN = re.compile(r"(sk-[a-zA-Z0-9]{20,}|Bearer\s+[a-zA-Z0-9_\-\.]+|api-key\s*:\s*[a-zA-Z0-9_\-]+)", re.IGNORECASE)
 
@@ -35,8 +35,8 @@ class DecisionProvenanceError(ValueError):
     """Raised when a decision record or chain fails provenance, signature, or tamper verification."""
 
 
-def rfc8785_canonicalize(payload: dict[str, Any]) -> bytes:
-    """Produces deterministic RFC 8785 JSON bytes (sorted keys, compact separators, UTF-8)."""
+def canonicalize_json_v1(payload: dict[str, Any]) -> bytes:
+    """Produces deterministic compact JSON bytes (sorted keys, compact separators, UTF-8)."""
     return json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
 
 
@@ -82,13 +82,15 @@ class DecisionRecord:
         resource_id: str,
         action: str,
         verdict: str,
+        signing_key: bytes,
         stream_sequence: int = 1,
         previous_record_digest: str = "GENESIS",
         policy_version: str = "1.0.0",
         evaluator_version: str = "1.0.0",
-        signing_key: bytes = DEFAULT_SIGNING_KEY,
         timestamp: str | None = None,
     ) -> DecisionRecord:
+        if not signing_key or len(signing_key) < 32:
+            raise DecisionProvenanceError("signing_key must contain at least 256 bits (32 bytes)")
         if stream_sequence <= 0:
             raise DecisionProvenanceError("stream_sequence must be a positive integer")
 
@@ -113,11 +115,11 @@ class DecisionRecord:
         # 1. Redaction & Sanitization Check
         sanitized_payload = _sanitize_value(raw_payload)
 
-        # 2. Level 1 RFC 8785 Canonical Digest Computation
-        canonical_bytes = rfc8785_canonicalize(sanitized_payload)
+        # 2. Level 1 Canonical Digest Computation
+        canonical_bytes = canonicalize_json_v1(sanitized_payload)
         current_digest = hashlib.sha256(canonical_bytes).hexdigest()
 
-        # 3. Level 2 Cryptographic Signature Generation
+        # 3. Level 2 Cryptographic HMAC Signature Generation
         sig = hmac.new(signing_key, current_digest.encode("utf-8"), hashlib.sha256).hexdigest()
 
         return cls(
@@ -158,7 +160,7 @@ class DecisionRecord:
         }
 
     def verify_digest(self) -> bool:
-        """Level 1 verification: Re-computes and verifies the RFC 8785 canonical digest."""
+        """Level 1 verification: Re-computes and verifies the canonical digest."""
         if self.schema_version != SCHEMA_VERSION:
             raise DecisionProvenanceError(f"Unsupported schema_version: {self.schema_version}")
         if self.canonicalization_version != CANONICALIZATION_VERSION:
@@ -166,13 +168,15 @@ class DecisionRecord:
 
         payload = self._build_canonical_payload()
         _sanitize_value(payload)
-        expected_digest = hashlib.sha256(rfc8785_canonicalize(payload)).hexdigest()
+        expected_digest = hashlib.sha256(canonicalize_json_v1(payload)).hexdigest()
         if self.current_record_digest != expected_digest:
             raise DecisionProvenanceError("Decision record digest mismatch (tampering detected)")
         return True
 
-    def verify_signature(self, signing_key: bytes = DEFAULT_SIGNING_KEY) -> bool:
-        """Level 2 verification: Verifies the cryptographic HMAC signature against signing key."""
+    def verify_signature(self, signing_key: bytes) -> bool:
+        """Level 2 verification: Verifies the cryptographic HMAC signature against an injected signing key."""
+        if not signing_key or len(signing_key) < 32:
+            raise DecisionProvenanceError("signing_key must contain at least 256 bits (32 bytes)")
         self.verify_digest()
         expected_sig = hmac.new(signing_key, self.current_record_digest.encode("utf-8"), hashlib.sha256).hexdigest()
         if not hmac.compare_digest(self.signature, expected_sig):
@@ -181,14 +185,16 @@ class DecisionRecord:
 
 
 class ProvenanceChain:
-    """Level 3 & 4 Verification Engine: Validates sequential audit chains."""
+    """Level 3 Verification Engine: Validates sequential audit chains."""
 
     @staticmethod
     def validate_chain(
         records: Sequence[DecisionRecord],
         *,
-        signing_key: bytes = DEFAULT_SIGNING_KEY,
+        signing_key: bytes,
     ) -> bool:
+        if not signing_key or len(signing_key) < 32:
+            raise DecisionProvenanceError("signing_key must contain at least 256 bits (32 bytes)")
         if not records:
             raise DecisionProvenanceError("Provenance chain is empty")
 
@@ -221,8 +227,10 @@ class ProvenanceChain:
         return True
 
 
-def assert_decision_provenance_gate() -> dict[str, Any]:
-    """Decomposed Release Gate Verification Function."""
+def assert_decision_provenance_gate(signing_key: bytes | None = None) -> dict[str, bool]:
+    """Decomposed Release Gate Verification Function with Real Executable Negative Tests."""
+    key = signing_key or secrets.token_bytes(32)
+
     rec1 = DecisionRecord.create(
         decision_id="dec_001",
         correlation_id="corr_100",
@@ -233,6 +241,7 @@ def assert_decision_provenance_gate() -> dict[str, Any]:
         verdict="ALLOW",
         stream_sequence=1,
         previous_record_digest="GENESIS",
+        signing_key=key,
     )
     rec2 = DecisionRecord.create(
         decision_id="dec_002",
@@ -244,17 +253,80 @@ def assert_decision_provenance_gate() -> dict[str, Any]:
         verdict="DENY",
         stream_sequence=2,
         previous_record_digest=rec1.current_record_digest,
+        signing_key=key,
     )
 
-    valid_chain = ProvenanceChain.validate_chain([rec1, rec2])
+    # 1. Positive Chain Verification
+    valid_chain = ProvenanceChain.validate_chain([rec1, rec2], signing_key=key)
+
+    # 2. Executable Negative Check: Duplicate Rejection
+    duplicate_rejection = False
+    try:
+        dup_rec = DecisionRecord.create(
+            decision_id="dec_001",  # Duplicate ID
+            correlation_id="corr_102",
+            tenant_id="tenant_a",
+            user_id="user_1",
+            resource_id="run_1",
+            action="WRITE",
+            verdict="DENY",
+            stream_sequence=3,
+            previous_record_digest=rec2.current_record_digest,
+            signing_key=key,
+        )
+        ProvenanceChain.validate_chain([rec1, rec2, dup_rec], signing_key=key)
+    except DecisionProvenanceError:
+        duplicate_rejection = True
+
+    # 3. Executable Negative Check: Sensitive Secret Exclusion
+    sensitive_exclusion = False
+    try:
+        DecisionRecord.create(
+            decision_id="dec_secret",
+            correlation_id="corr_secret",
+            tenant_id="tenant_a",
+            user_id="user_1",
+            resource_id="Bearer seeded-test-secret-token",  # Sensitive!
+            action="READ",
+            verdict="DENY",
+            signing_key=key,
+        )
+    except DecisionProvenanceError:
+        sensitive_exclusion = True
+
+    # 4. Executable Negative Check: Sequence Gap Validation
+    sequence_validation = False
+    try:
+        gap_rec = DecisionRecord.create(
+            decision_id="dec_003",
+            correlation_id="corr_103",
+            tenant_id="tenant_a",
+            user_id="user_1",
+            resource_id="run_1",
+            action="WRITE",
+            verdict="DENY",
+            stream_sequence=5,  # Sequence gap!
+            previous_record_digest=rec2.current_record_digest,
+            signing_key=key,
+        )
+        ProvenanceChain.validate_chain([rec1, rec2, gap_rec], signing_key=key)
+    except DecisionProvenanceError:
+        sequence_validation = True
+
+    # 5. Executable Negative Check: Wrong Signature Key Rejection
+    wrong_key_rejection = False
+    try:
+        rec1.verify_signature(secrets.token_bytes(32))
+    except DecisionProvenanceError:
+        wrong_key_rejection = True
 
     return {
         "decision_schema_validation": rec1.schema_version == SCHEMA_VERSION,
         "decision_canonicalization": rec1.canonicalization_version == CANONICALIZATION_VERSION,
         "decision_digest_verification": rec1.verify_digest(),
-        "decision_signature_verification": rec1.verify_signature(),
+        "decision_signature_verification": wrong_key_rejection,
         "decision_chain_integrity": valid_chain,
-        "decision_sequence_validation": rec2.stream_sequence == 2,
-        "decision_duplicate_rejection": True,
-        "decision_sensitive_field_exclusion": True,
+        "decision_sequence_validation": sequence_validation,
+        "decision_duplicate_rejection": duplicate_rejection,
+        "decision_sensitive_field_exclusion": sensitive_exclusion,
     }

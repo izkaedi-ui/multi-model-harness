@@ -35,7 +35,7 @@ The platform guarantees seven non-negotiable trust boundaries backed by empirica
 | 🔌 **Trusted Extensibility** | *Can extensions be trusted?* | Plugin verification report & compatibility manifest | `v0.9.x` |
 | 🔒 **Confidential Observability** | *Did telemetry leak protected data?* | Secret-leak audit report with zero findings | `v0.9.x` |
 | 🔑 **Object Authorization** | *Can one identity access or control another identity's resources?* | Cross-tenant IDOR suite & object ownership audit report | `v0.9.x` |
-| 📜 **Decision Provenance** | *Can every authorization or evaluation decision be explained?* | Cryptographically hashed decision records & SHA-256 digests | `v0.9.x` |
+| 📜 **Decision Provenance** | *Can every authorization or evaluation decision be explained?* | HMAC-authenticated chained decision records & SHA-256 digests | `v0.9.x` |
 
 ---
 

@@ -354,23 +354,24 @@ def backfill_costs(dry_run: bool) -> None:
         click.echo(f"[ERROR] Backfill failed: {e}")
 
 
-def _run_quiet_command(args: list[str]) -> bool:
+def _git_working_tree_clean() -> bool:
     import subprocess
     completed = subprocess.run(
-        args,
+        ["git", "status", "--porcelain=v1"],
         capture_output=True,
         text=True,
         encoding="utf-8",
         errors="replace",
         check=False,
     )
-    return completed.returncode == 0
+    return completed.returncode == 0 and completed.stdout.strip() == ""
 
 
 def _collect_release_checks() -> dict[str, bool]:
     import compileall
     import contextlib
     import io
+    import secrets
     import sqlite3
 
     import pytest
@@ -382,7 +383,7 @@ def _collect_release_checks() -> dict[str, bool]:
     try:
         out_buf = io.StringIO()
         with contextlib.redirect_stdout(out_buf), contextlib.redirect_stderr(out_buf):
-            ret = pytest.main(["-q", "tests", "--ignore=tests/unit/test_platform_hardening.py"])
+            ret = pytest.main(["-q", "tests"])
         unit_ok = (ret == 0)
     except Exception:
         unit_ok = False
@@ -427,7 +428,6 @@ def _collect_release_checks() -> dict[str, bool]:
         telemetry_secret_safety = False
 
     # 6. Evaluation Integrity Gate Check
-    # 6. Evaluation Integrity Check
     try:
         from security.evaluation_integrity_gate import assert_evaluation_integrity
         integrity_res = assert_evaluation_integrity("reports/judge_resistance.json")
@@ -451,7 +451,8 @@ def _collect_release_checks() -> dict[str, bool]:
     # 8. Decision Provenance & Cryptographic Audit Check
     try:
         from security.decision_provenance import assert_decision_provenance_gate
-        prov_gate = assert_decision_provenance_gate()
+        prov_key = secrets.token_bytes(32)
+        prov_gate = assert_decision_provenance_gate(prov_key)
         decision_provenance = all(prov_gate.values())
         decision_schema_validation = prov_gate["decision_schema_validation"]
         decision_canonicalization = prov_gate["decision_canonicalization"]
@@ -472,8 +473,8 @@ def _collect_release_checks() -> dict[str, bool]:
         decision_duplicate_rejection = False
         decision_sensitive_field_exclusion = False
 
-    # 9. Git Status Check
-    git_ok = _run_quiet_command(["git", "status", "--short"])
+    # 9. Git Status Check (Inspect stdout for clean working tree)
+    git_ok = _git_working_tree_clean()
 
     return {
         "compilation": comp_ok,
@@ -552,8 +553,7 @@ def release_check(fmt: str, strict: bool) -> None:
     required_ok = all(
         checks[k] for k in ("compilation", "unit_tests", "validation", "database_integrity")
     )
-    git_ok = checks["git_clean"]
-    ready = required_ok and git_ok if strict else required_ok
+    ready = all(checks.values()) if strict else required_ok
 
     payload = {
         "verdict": "ready" if ready else "failed",
