@@ -329,10 +329,13 @@ def release_check(fmt: str, strict: bool) -> None:
     import subprocess
     import sqlite3
 
-    if fmt == "text":
+    if fmt == "json":
+        logging.getLogger().setLevel(logging.CRITICAL + 1)
+    else:
         click.echo("===========================================")
         click.echo(" Multi-Provider Harness Release Readiness ")
         click.echo("===========================================\n")
+
 
     results: dict[str, bool] = {}
 
@@ -348,10 +351,10 @@ def release_check(fmt: str, strict: bool) -> None:
         import pytest
         import io
         import contextlib
-        # Suppress pytest stdout during json mode to keep stdout 100% JSON pure
+        # Suppress pytest stdout during json mode and exclude test_platform_hardening to avoid recursive loop
         out_buf = io.StringIO()
         with contextlib.redirect_stdout(out_buf), contextlib.redirect_stderr(out_buf):
-            ret = pytest.main(["-q", "tests"])
+            ret = pytest.main(["-q", "tests", "--ignore=tests/unit/test_platform_hardening.py"])
         test_ok = (ret == 0)
         results["unit_tests"] = test_ok
         if fmt == "text":
@@ -362,6 +365,7 @@ def release_check(fmt: str, strict: bool) -> None:
         if fmt == "text":
             click.echo("2. Running Unit Test Suite...")
             click.echo(f"   -> Unit Tests: FAIL ({e})")
+
 
 
     # 3. YAML Configuration Validation
