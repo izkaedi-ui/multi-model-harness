@@ -355,12 +355,15 @@ def _collect_release_checks() -> dict[str, bool]:
 
     # 3. YAML Configuration Validation
     try:
-        from cli.main import validate as validate_cmd
-        ctx = click.get_current_context()
-        ctx.invoke(validate_cmd)
-        val_ok = True
+        from security.input_validator import validate_jsonl_file
+        categories_dir = pathlib.Path("categories")
+        val_errors = []
+        for jsonl_file in categories_dir.rglob("*.jsonl"):
+            val_errors.extend(validate_jsonl_file(jsonl_file))
+        val_ok = (len(val_errors) == 0)
     except Exception:
         val_ok = False
+
 
     # 4. Database Integrity
     try:
@@ -414,7 +417,8 @@ def release_check(fmt: str, strict: bool) -> None:
     }
 
     if fmt == "json":
-        click.echo(json.dumps(payload, indent=2))
+        sys.stdout.write(json.dumps(payload, indent=2) + "\n")
+        sys.stdout.flush()
     else:
         for gate, status in checks.items():
             click.echo(f"   -> {gate:<25} : {'PASS' if status else 'FAIL/WARN'}")
@@ -426,6 +430,7 @@ def release_check(fmt: str, strict: bool) -> None:
             click.echo(f"{gate:<25} : {'PASS' if status else 'FAIL/WARN'}")
 
         click.echo("\nVERDICT: " + ("READY FOR RELEASE [OK]" if ready else "ATTENTION REQUIRED [WARN]"))
+
 
     if not ready:
         sys.exit(1)
