@@ -387,23 +387,52 @@ def _collect_release_checks() -> dict[str, bool]:
     }
 
 
+from contextlib import contextmanager
+
+
+@contextmanager
+def _temporarily_suppress_logging():
+    root_logger = logging.getLogger()
+    previous_level = root_logger.level
+    root_logger.setLevel(logging.CRITICAL + 1)
+    try:
+        yield
+    finally:
+        root_logger.setLevel(previous_level)
+
+
+def _write_json_stdout(payload: object) -> None:
+    """
+    Emit exactly one JSON document without passing through Click/Colorama.
+
+    This avoids Windows console-handle failures in wrapped shells and preserves
+    stdout purity for CI consumers.
+    """
+    rendered = json.dumps(
+        payload,
+        indent=2,
+        ensure_ascii=True,
+        sort_keys=False,
+    )
+    sys.stdout.write(rendered)
+    sys.stdout.write("\n")
+    sys.stdout.flush()
+
+
 @cli.command()
 @click.option("--format", "fmt", default="text", type=click.Choice(["text", "json"]), help="Output format (text or json)")
 @click.option("--strict", is_flag=True, help="Strict mode: fail non-zero if any warnings exist")
 def release_check(fmt: str, strict: bool) -> None:
     """Run comprehensive automated verification suite to validate release readiness."""
-    import logging
-    import json
-    import sys
-
     if fmt == "json":
-        logging.getLogger().setLevel(logging.CRITICAL + 1)
+        with _temporarily_suppress_logging():
+            checks = _collect_release_checks()
     else:
         click.echo("===========================================")
         click.echo(" Multi-Provider Harness Release Readiness ")
         click.echo("===========================================\n")
+        checks = _collect_release_checks()
 
-    checks = _collect_release_checks()
     required_ok = all(
         checks[k] for k in ("compilation", "unit_tests", "validation", "database_integrity")
     )
@@ -417,8 +446,7 @@ def release_check(fmt: str, strict: bool) -> None:
     }
 
     if fmt == "json":
-        sys.stdout.write(json.dumps(payload, indent=2) + "\n")
-        sys.stdout.flush()
+        _write_json_stdout(payload)
     else:
         for gate, status in checks.items():
             click.echo(f"   -> {gate:<25} : {'PASS' if status else 'FAIL/WARN'}")
@@ -431,9 +459,9 @@ def release_check(fmt: str, strict: bool) -> None:
 
         click.echo("\nVERDICT: " + ("READY FOR RELEASE [OK]" if ready else "ATTENTION REQUIRED [WARN]"))
 
-
     if not ready:
         sys.exit(1)
+
 
 
 

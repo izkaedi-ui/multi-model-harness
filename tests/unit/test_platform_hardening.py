@@ -57,6 +57,23 @@ class TestCLIMachineReadablePurity(unittest.TestCase):
         self.assertEqual(data["verdict"], "failed")
         self.assertFalse(data["checks"]["git_clean"])
 
+    def test_write_json_stdout_bypasses_click_console_layer(self):
+        import io
+        from cli.main import _write_json_stdout
+        stream = io.StringIO()
+        with patch("sys.stdout", stream):
+            _write_json_stdout(
+                {
+                    "verdict": "ready",
+                    "strict_mode": True,
+                    "checks": {"compilation": True},
+                }
+            )
+        payload = json.loads(stream.getvalue())
+        self.assertEqual(payload["verdict"], "ready")
+        self.assertTrue(payload["strict_mode"])
+
+
 
 
 
