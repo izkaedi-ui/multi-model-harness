@@ -184,6 +184,46 @@ def discover_models() -> None:
     click.echo("\n[OK] Discovery complete.")
 
 
+@cli.command()
+def leaderboard() -> None:
+    """Generate cross-provider performance leaderboard from SQLite run history."""
+    import sqlite3
+
+    click.echo("--- Multi-Provider Leaderboard (Historical SQLite Data) ---")
+    try:
+        conn = sqlite3.connect("harness.db")
+        cursor = conn.execute("""
+            SELECT
+                m.provider_id,
+                m.model_name,
+                COUNT(e.id) as total_execs,
+                AVG(e.latency_ms) as avg_latency_ms,
+                SUM(e.input_tokens + e.output_tokens) as total_tokens,
+                SUM(e.estimated_cost_usd) as total_cost
+            FROM executions e
+            JOIN models m ON m.id = e.model_id
+            WHERE e.status = 'completed'
+            GROUP BY m.provider_id, m.model_name
+            ORDER BY total_execs DESC
+        """)
+        rows = cursor.fetchall()
+        conn.close()
+
+        if not rows:
+            click.echo("No completed executions found in harness.db.")
+            return
+
+        click.echo(f"{'Provider':<12} {'Model':<25} {'Executions':<12} {'Avg Latency':<14} {'Tokens':<10} {'Total Cost':<10}")
+        click.echo("-" * 85)
+        for prov, model, count, avg_lat, tokens, cost in rows:
+            lat_str = f"{avg_lat:.1f} ms" if avg_lat else "N/A"
+            click.echo(f"{prov:<12} {model:<25} {count:<12} {lat_str:<14} {tokens:<10} ${cost:.4f}")
+
+    except Exception as e:
+        click.echo(f"[ERROR] Failed to query leaderboard: {e}")
+
+
 if __name__ == "__main__":
     cli()
+
 
