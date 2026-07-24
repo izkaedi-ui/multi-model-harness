@@ -353,17 +353,19 @@ def _collect_release_checks() -> dict[str, bool]:
     except Exception:
         unit_ok = False
 
-    # 3. YAML Configuration Validation
+    # 3. YAML Configuration & Benchmark DSL Validation
     try:
         from security.input_validator import validate_jsonl_file
+        from benchmark_dsl.parser import DSLParser
         categories_dir = pathlib.Path("categories")
         val_errors = []
         for jsonl_file in categories_dir.rglob("*.jsonl"):
             val_errors.extend(validate_jsonl_file(jsonl_file))
-        val_ok = (len(val_errors) == 0)
+
+        dsl_ok = pathlib.Path("benchmark_dsl/schema.json").exists()
+        val_ok = (len(val_errors) == 0 and dsl_ok)
     except Exception:
         val_ok = False
-
 
     # 4. Database Integrity
     try:
@@ -384,7 +386,9 @@ def _collect_release_checks() -> dict[str, bool]:
         "validation": val_ok,
         "database_integrity": db_ok,
         "git_clean": git_ok,
+        "benchmark_dsl": bool(dsl_ok),
     }
+
 
 
 from contextlib import contextmanager
