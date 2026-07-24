@@ -143,7 +143,74 @@
     </div></section>
     <section class="card" style="min-width:320px;text-align:center"><b>OMEGA PRIME STATUS</b><br><span style="color:#6ff3a3;font-size:20px">MAXIMUM POWER ENGAGED ⚡</span></section>
   </div>
-</div>
+
+  <!-- Cyberpunk Achievement & Progression Section -->
+  <div class="grid" style="margin-top:14px">
+    <div class="col" style="grid-column: span 3">
+      <section class="card panel">
+        <h3 class="title" style="display:flex;justify-content:space-between;align-items:center">
+          <span>🏅 OMEGA SUPREME PROGRESSION SYSTEM & HONORS BOARD</span>
+          <span style="font-size:11px;color:var(--cyan)">RANK: PRESTIGE ARCHITECT SUPREME ⚡</span>
+        </h3>
+        
+        <style>
+          .achieve-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:14px}
+          .badge-card{background:#091629;border:1px solid #1f3f66;border-radius:10px;padding:10px;text-align:center;position:relative;overflow:hidden;transition:.2s}
+          .badge-card:hover{transform:translateY(-3px);border-color:var(--cyan);box-shadow:0 0 15px rgba(84,232,255,.25)}
+          .badge-card .icon{font-size:24px;margin-bottom:4px}
+          .badge-card .name{font-size:11px;font-weight:700;color:#e1eeff}
+          .badge-card .desc{font-size:9px;color:var(--muted);margin-top:3px}
+          .badge-card.legendary{border-color:var(--gold);background:linear-gradient(180deg,#1c1708,#091629)}
+          .badge-card.legendary .icon{text-shadow:0 0 12px var(--gold)}
+          
+          .avatar-bar{display:grid;grid-template-columns:1fr 2fr;gap:14px;background:#06101d;border:1px solid #1c385c;border-radius:10px;padding:12px}
+          .avatar-box{display:flex;align-items:center;gap:14px}
+          .avatar-frame{width:64px;height:64px;border-radius:50%;position:relative;display:grid;place-items:center;background:conic-gradient(var(--cyan),var(--violet),var(--gold),var(--cyan));padding:3px;animation:frameRotate 6s linear infinite}
+          @keyframes frameRotate{100%{transform:rotate(360deg)}}
+          .avatar-inner{width:100%;height:100%;border-radius:50%;background:#091424;display:grid;place-items:center;font-size:28px}
+          
+          .dna-bar{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:10px}
+          .dna-col{background:#091629;border:1px solid #193454;border-radius:6px;padding:8px;text-align:center}
+          .dna-col .lbl{font-size:9px;color:var(--muted);margin-bottom:4px}
+          .dna-col .val{font-size:12px;font-weight:800;color:var(--cyan)}
+        </style>
+
+        <div class="achieve-grid">
+          <div class="badge-card legendary"><div class="icon">Ω</div><div class="name">Omega Prime</div><div class="desc">100% Release Gate Streak</div></div>
+          <div class="badge-card"><div class="icon">⚖</div><div class="name">Judge Master</div><div class="desc">Phase 3 Ensembles Active</div></div>
+          <div class="badge-card"><div class="icon">⌘</div><div class="name">DSL Artisan</div><div class="desc">Schema & SHA-256 Fingerprint</div></div>
+          <div class="badge-card"><div class="icon">⚗</div><div class="name">Plugin Pioneer</div><div class="desc">Dynamic Provider Boundaries</div></div>
+          <div class="badge-card"><div class="icon">🛡</div><div class="name">Release Guardian</div><div class="desc">Strict Machine JSON Gate</div></div>
+          <div class="badge-card legendary"><div class="icon">⚡</div><div class="name">Pareto Master</div><div class="desc">Cost/Latency Optimal</div></div>
+        </div>
+
+        <div class="avatar-bar">
+          <div class="avatar-box">
+            <div class="avatar-frame"><div class="avatar-inner">🧙‍♂️</div></div>
+            <div>
+              <div style="font-size:14px;font-weight:800;color:var(--text)">Chief Reality Officer</div>
+              <div style="font-size:10px;color:var(--green)">TITLE: ARCHITECT SUPREME ⚡</div>
+              <div style="font-size:9px;color:var(--muted);margin-top:2px">PRESTIGE FRAME: QUANTUM CIRCUIT RING</div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:10px;color:var(--cyan);font-weight:700;margin-bottom:4px">GENOME CAPABILITY DNA SEQUENCE</div>
+            <div class="dna-bar">
+              <div class="dna-col"><div class="lbl">SECURITY</div><div class="val">100%</div></div>
+              <div class="dna-col"><div class="lbl">TESTING</div><div class="val">100%</div></div>
+              <div class="dna-col"><div class="lbl">DSL</div><div class="val">95%</div></div>
+              <div class="dna-col"><div class="lbl">ENSEMBLE</div><div class="val">98%</div></div>
+              <div class="dna-col"><div class="lbl">REPLAY</div><div class="val">100%</div></div>
+              <div class="dna-col"><div class="lbl">COST</div><div class="val">94%</div></div>
+              <div class="dna-col"><div class="lbl">RELEASE</div><div class="val">READY</div></div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+    </div>
+  </div>
+
 <div class="tooltip" id="tip"></div>
 
 <script>
