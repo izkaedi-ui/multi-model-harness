@@ -1,0 +1,158 @@
+{
+  "schema_version": "1.0.0",
+  "project": "multi-model-harness",
+  "purpose": "Minimal high-leverage implementation sequence.",
+  "missions": [
+    {
+      "order": 1,
+      "id": "ESSENTIAL-001",
+      "source": "PROVIDER-001",
+      "title": "Dynamic Provider Plugin Foundation",
+      "priority": "P0",
+      "why_now": "All future providers and local runtimes depend on a stable extension boundary.",
+      "acceptance_tests": [
+        "External plugin discovered without core edit",
+        "Invalid metadata rejected",
+        "Existing providers remain compatible"
+      ],
+      "verification": [
+        "python -m pytest tests/unit/test_provider_plugins.py -v",
+        "python -m pytest -q",
+        "python -m cli.main release-check --format json --strict"
+      ],
+      "rollback": "Retain static provider map as compatibility fallback; git revert <commit>."
+    },
+    {
+      "order": 2,
+      "id": "ESSENTIAL-002",
+      "source": "BENCH-001",
+      "title": "Versioned Benchmark DSL",
+      "priority": "P0",
+      "why_now": "Benchmark authoring and reproducibility are the next scaling bottleneck.",
+      "acceptance_tests": [
+        "Valid multi-turn YAML parses",
+        "Invalid assertions fail",
+        "Legacy JSONL remains supported",
+        "Fingerprint is stable"
+      ],
+      "verification": [
+        "python -m pytest tests/unit/test_benchmark_dsl.py -v",
+        "python -m cli.main validate",
+        "python -m pytest -q"
+      ],
+      "rollback": "Keep legacy JSONL as default and feature-flag DSL loading."
+    },
+    {
+      "order": 3,
+      "id": "ESSENTIAL-003",
+      "source": "EVAL-001",
+      "title": "Judge Ensemble Core",
+      "priority": "P0",
+      "why_now": "Routing and research conclusions require a stronger evaluation basis.",
+      "acceptance_tests": [
+        "Fixed votes yield fixed result",
+        "Disagreement is preserved",
+        "Missing judge result cannot silently pass"
+      ],
+      "verification": [
+        "python -m pytest tests/unit/test_judge_ensemble.py -v",
+        "python -m pytest -q"
+      ],
+      "rollback": "Retain the current single-scorer path behind a compatibility flag."
+    },
+    {
+      "order": 4,
+      "id": "ESSENTIAL-004",
+      "source": "EVAL-002",
+      "title": "Statistical Confidence and Reproducibility",
+      "priority": "P0",
+      "why_now": "Optimization and regression decisions require quantified uncertainty.",
+      "acceptance_tests": [
+        "Fixed seed yields stable intervals",
+        "Manifest captures git/config/benchmark hashes",
+        "Replay detects drift"
+      ],
+      "verification": [
+        "python -m pytest tests/unit/test_statistics.py -v",
+        "python -m pytest tests/integration/test_manifest_reproducibility.py -v",
+        "python -m cli.main release-check --format json --strict"
+      ],
+      "rollback": "Keep statistics additive and do not change verdict semantics initially."
+    },
+    {
+      "order": 5,
+      "id": "ESSENTIAL-005",
+      "source": "OBS-001",
+      "title": "OpenTelemetry Foundation",
+      "priority": "P0",
+      "why_now": "Distributed work and APIs need end-to-end correlation.",
+      "acceptance_tests": [
+        "Every execution links to a run trace",
+        "Telemetry failures do not fail benchmarks",
+        "Secrets do not appear in span attributes"
+      ],
+      "verification": [
+        "python -m pytest tests/unit/test_tracing.py -v",
+        "python -m pytest -q"
+      ],
+      "rollback": "Keep telemetry feature-flagged with a no-op default exporter."
+    },
+    {
+      "order": 6,
+      "id": "ESSENTIAL-006",
+      "source": "SDK-001",
+      "title": "REST API and Python SDK",
+      "priority": "P1",
+      "why_now": "The harness becomes reusable infrastructure only when callers can embed it.",
+      "acceptance_tests": [
+        "Run creation is idempotent",
+        "Typed response models",
+        "Authentication and cancellation work"
+      ],
+      "verification": [
+        "python -m pytest tests/integration/test_api.py -v",
+        "python -m pytest -q",
+        "python -m cli.main release-check --format json --strict"
+      ],
+      "rollback": "Keep CLI as primary entry point and API additive."
+    },
+    {
+      "order": 7,
+      "id": "ESSENTIAL-007",
+      "source": "INFRA-001",
+      "title": "Distributed Coordinator and Worker Prototype",
+      "priority": "P1",
+      "why_now": "Scaling should follow stable contracts, manifests, telemetry, and APIs.",
+      "acceptance_tests": [
+        "Worker crash does not lose work",
+        "Duplicate execution is prevented",
+        "Lease expiration is deterministic"
+      ],
+      "verification": [
+        "python -m pytest tests/integration/test_worker_recovery.py -v",
+        "python -m pytest -q"
+      ],
+      "rollback": "Keep local runner as default and distributed mode feature-flagged."
+    },
+    {
+      "order": 8,
+      "id": "ESSENTIAL-008",
+      "source": "OPT-001",
+      "title": "Explainable Cost/Latency/Quality Router",
+      "priority": "P1",
+      "why_now": "Optimization is safe only after metadata, evaluation confidence, and telemetry are trustworthy.",
+      "acceptance_tests": [
+        "Cheapest qualified model selected",
+        "Quality floor never violated",
+        "Unknown pricing rejected or penalized",
+        "Decision reasons recorded"
+      ],
+      "verification": [
+        "python -m pytest tests/unit/test_router.py -v",
+        "python -m pytest -q",
+        "python -m cli.main release-check --format json --strict"
+      ],
+      "rollback": "Keep explicit model selection as default; automatic routing stays feature-flagged."
+    }
+  ]
+}

@@ -1,0 +1,517 @@
+{
+  "schema_version": "1.0.0",
+  "project": "multi-model-harness",
+  "vision": "Evolve the hardened four-provider harness into an extensible, observable, distributed, optimization-aware AI evaluation platform.",
+  "principles": [
+    "Evidence over assumptions",
+    "Provider identity preservation",
+    "Reversible-by-default engineering",
+    "Machine-readable verification",
+    "Human-governed autonomy"
+  ],
+  "streams": [
+    {
+      "phase": 1,
+      "stream": "Provider Platform",
+      "current_state": "Strong",
+      "next_major_milestone": "Dynamic provider plugins and automatic capability discovery",
+      "features": [
+        {
+          "id": "PROVIDER-001",
+          "title": "Dynamic Provider Plugin System",
+          "priority": "P0",
+          "status": "planned",
+          "files": [
+            "adapters/plugin_loader.py",
+            "adapters/provider_registry.py",
+            "tests/unit/test_provider_plugins.py"
+          ],
+          "code": "from importlib.metadata import entry_points\n\nclass ProviderRegistry:\n    def discover(self):\n        return entry_points(group='multi_model_harness.providers')\n\n    def load(self, name: str):\n        plugins = {ep.name: ep for ep in self.discover()}\n        if name not in plugins:\n            raise KeyError(f'Unknown provider plugin: {name}')\n        return plugins[name].load()()\n",
+          "acceptance_criteria": [
+            "External mock provider loads without editing core code",
+            "Duplicate provider names fail deterministically",
+            "Existing providers remain backward compatible"
+          ]
+        },
+        {
+          "id": "PROVIDER-002",
+          "title": "Automatic Capability Discovery",
+          "priority": "P0",
+          "status": "planned",
+          "files": [
+            "adapters/capability_discovery.py",
+            "adapters/capability_cache.py"
+          ],
+          "code": "class CapabilityDiscovery:\n    async def discover(self, adapter):\n        models = await adapter.list_models()\n        return [adapter.describe_model(model) for model in models]\n",
+          "acceptance_criteria": [
+            "Discovery cache is timestamped",
+            "Removed models are flagged before scheduling",
+            "Last known-good cache survives provider API failure"
+          ]
+        }
+      ]
+    },
+    {
+      "phase": 2,
+      "stream": "Benchmark Engine",
+      "current_state": "Good",
+      "next_major_milestone": "DSL, synthetic generation, and benchmark versioning",
+      "features": [
+        {
+          "id": "BENCH-001",
+          "title": "Benchmark DSL",
+          "priority": "P0",
+          "status": "planned",
+          "files": [
+            "benchmark_dsl/models.py",
+            "benchmark_dsl/parser.py",
+            "benchmark_dsl/schema.json"
+          ],
+          "code": "from dataclasses import dataclass\n\n@dataclass(frozen=True)\nclass BenchmarkScenario:\n    scenario_id: str\n    version: str\n    steps: tuple[dict, ...]\n    assertions: tuple[dict, ...]\n",
+          "acceptance_criteria": [
+            "Multi-turn YAML scenarios parse deterministically",
+            "Invalid schemas fail before execution",
+            "Legacy JSONL remains supported"
+          ]
+        },
+        {
+          "id": "BENCH-002",
+          "title": "Synthetic Benchmark Generation",
+          "priority": "P1",
+          "status": "planned",
+          "files": [
+            "benchmark_dsl/generator.py",
+            "benchmark_dsl/deduplicator.py"
+          ],
+          "code": "class SyntheticBenchmarkGenerator:\n    async def generate(self, spec, count: int):\n        candidates = await self._generate_candidates(spec, count)\n        return self._validate_and_deduplicate(candidates)\n",
+          "acceptance_criteria": [
+            "Generated cases pass schema validation",
+            "Near-duplicates are rejected",
+            "Generation provenance is recorded"
+          ]
+        },
+        {
+          "id": "BENCH-003",
+          "title": "Benchmark Versioning",
+          "priority": "P1",
+          "status": "planned",
+          "files": [
+            "benchmark_dsl/versioning.py",
+            "database/migrations/benchmark_versions.sql"
+          ],
+          "code": "import hashlib\n\ndef fingerprint(data: bytes) -> str:\n    return hashlib.sha256(data).hexdigest()\n",
+          "acceptance_criteria": [
+            "Every run records benchmark version and fingerprint",
+            "Historical runs resolve their original benchmark revision"
+          ]
+        }
+      ]
+    },
+    {
+      "phase": 3,
+      "stream": "Evaluation Engine",
+      "current_state": "Good",
+      "next_major_milestone": "Judge ensembles, confidence intervals, and reproducibility",
+      "features": [
+        {
+          "id": "EVAL-001",
+          "title": "Judge Ensembles",
+          "priority": "P0",
+          "status": "planned",
+          "files": [
+            "evaluators/contracts.py",
+            "evaluators/ensemble.py"
+          ],
+          "code": "class JudgeEnsemble:\n    async def evaluate(self, item, judges):\n        results = [await judge.evaluate(item) for judge in judges]\n        return self._aggregate(results)\n",
+          "acceptance_criteria": [
+            "Individual judge outputs are preserved",
+            "Disagreement is explicit",
+            "Aggregation is deterministic"
+          ]
+        },
+        {
+          "id": "EVAL-002",
+          "title": "Statistical Confidence Engine",
+          "priority": "P0",
+          "status": "planned",
+          "files": [
+            "analytics/statistics.py"
+          ],
+          "code": "def bootstrap_mean_ci(values, confidence=0.95, samples=10000, seed=0):\n    import random\n    rng = random.Random(seed)\n    means = [sum(rng.choices(values, k=len(values))) / len(values) for _ in range(samples)]\n    means.sort()\n    alpha = (1 - confidence) / 2\n    return means[int(alpha*samples)], means[int((1-alpha)*samples)-1]\n",
+          "acceptance_criteria": [
+            "Fixed seed produces stable intervals",
+            "Small-sample warnings are explicit",
+            "Variance is reported per model"
+          ]
+        },
+        {
+          "id": "EVAL-003",
+          "title": "Deterministic Replay",
+          "priority": "P1",
+          "status": "planned",
+          "files": [
+            "runner/replay.py",
+            "runner/manifest.py"
+          ],
+          "code": "class ReplayService:\n    async def replay(self, manifest):\n        return await self._runner.run(manifest.to_run_config())\n",
+          "acceptance_criteria": [
+            "Manifest contains git/config/benchmark hashes",
+            "Replay preserves request parameters",
+            "Replay drift is reported"
+          ]
+        }
+      ]
+    },
+    {
+      "phase": 4,
+      "stream": "Observability",
+      "current_state": "Basic",
+      "next_major_milestone": "OpenTelemetry, Prometheus, and Grafana",
+      "features": [
+        {
+          "id": "OBS-001",
+          "title": "OpenTelemetry Integration",
+          "priority": "P0",
+          "status": "planned",
+          "files": [
+            "telemetry/tracing.py",
+            "telemetry/context.py"
+          ],
+          "code": "from opentelemetry import trace\ntracer = trace.get_tracer('multi_model_harness')\n",
+          "acceptance_criteria": [
+            "Every run and execution has a trace ID",
+            "Provider/model/case are span attributes",
+            "Telemetry failure never breaks execution"
+          ]
+        },
+        {
+          "id": "OBS-002",
+          "title": "Prometheus Metrics",
+          "priority": "P1",
+          "status": "planned",
+          "files": [
+            "telemetry/prometheus.py"
+          ],
+          "code": "from prometheus_client import Counter, Histogram\nREQUESTS = Counter('harness_requests_total', 'Requests', ['provider','model','status'])\nLATENCY = Histogram('harness_latency_seconds', 'Latency', ['provider','model'])\n",
+          "acceptance_criteria": [
+            "Metrics endpoint is scrapeable",
+            "Labels contain no secrets",
+            "Cardinality is bounded"
+          ]
+        },
+        {
+          "id": "OBS-003",
+          "title": "Grafana Dashboards",
+          "priority": "P1",
+          "status": "planned",
+          "files": [
+            "deploy/grafana/harness-overview.json",
+            "deploy/grafana/provider-detail.json"
+          ],
+          "acceptance_criteria": [
+            "Dashboards import cleanly",
+            "P50/P95 latency and error rate are visible"
+          ]
+        }
+      ]
+    },
+    {
+      "phase": 5,
+      "stream": "Infrastructure",
+      "current_state": "Basic",
+      "next_major_milestone": "Distributed coordinator/workers and Kubernetes",
+      "features": [
+        {
+          "id": "INFRA-001",
+          "title": "Distributed Coordinator",
+          "priority": "P0",
+          "status": "planned",
+          "files": [
+            "distributed/coordinator.py",
+            "distributed/contracts.py"
+          ],
+          "code": "class Coordinator:\n    async def lease(self, worker_id, limit=1):\n        return await self._queue.lease(worker_id=worker_id, limit=limit)\n",
+          "acceptance_criteria": [
+            "Leases expire safely",
+            "Idempotency prevents duplicate execution",
+            "Coordinator restart preserves queued work"
+          ]
+        },
+        {
+          "id": "INFRA-002",
+          "title": "Worker Runtime",
+          "priority": "P0",
+          "status": "planned",
+          "files": [
+            "distributed/worker.py"
+          ],
+          "code": "class Worker:\n    async def run_forever(self):\n        while not self._cancelled:\n            jobs = await self._coordinator.lease(self.worker_id)\n            await self._execute_batch(jobs)\n",
+          "acceptance_criteria": [
+            "Worker crash returns expired jobs",
+            "Shutdown closes adapters",
+            "Heartbeat and cancellation are bounded"
+          ]
+        },
+        {
+          "id": "INFRA-003",
+          "title": "Kubernetes Deployment",
+          "priority": "P1",
+          "status": "planned",
+          "files": [
+            "deploy/helm/Chart.yaml",
+            "deploy/helm/values.yaml",
+            "deploy/helm/templates/"
+          ],
+          "acceptance_criteria": [
+            "Helm install succeeds in a test cluster",
+            "Workers scale horizontally",
+            "Secrets are referenced, never embedded"
+          ]
+        }
+      ]
+    },
+    {
+      "phase": 6,
+      "stream": "SDK Platform",
+      "current_state": "Minimal",
+      "next_major_milestone": "REST API, Python SDK, TypeScript SDK, and MCP",
+      "features": [
+        {
+          "id": "SDK-001",
+          "title": "REST API",
+          "priority": "P0",
+          "status": "planned",
+          "files": [
+            "api/app.py",
+            "api/routes/runs.py",
+            "api/routes/providers.py"
+          ],
+          "code": "from fastapi import FastAPI\napp = FastAPI(title='Multi-Model Harness API')\n\n@app.get('/health')\ndef health():\n    return {'status':'ok'}\n",
+          "acceptance_criteria": [
+            "OpenAPI schema is generated",
+            "Run creation supports idempotency keys",
+            "Authentication and pagination are implemented"
+          ]
+        },
+        {
+          "id": "SDK-002",
+          "title": "Python SDK",
+          "priority": "P0",
+          "status": "planned",
+          "files": [
+            "sdk/python/security_harness_client/client.py"
+          ],
+          "code": "class HarnessClient:\n    def __init__(self, base_url, token=None):\n        self.base_url = base_url.rstrip('/')\n        self.token = token\n",
+          "acceptance_criteria": [
+            "Typed request/response models",
+            "Bounded timeout and retry policy",
+            "Sync and async clients"
+          ]
+        },
+        {
+          "id": "SDK-003",
+          "title": "TypeScript SDK",
+          "priority": "P1",
+          "status": "planned",
+          "files": [
+            "sdk/typescript/src/client.ts",
+            "sdk/typescript/package.json"
+          ],
+          "code": "export class HarnessClient {\n  constructor(private readonly baseUrl: string, private readonly token?: string) {}\n}\n",
+          "acceptance_criteria": [
+            "Generated from committed OpenAPI schema",
+            "Package builds reproducibly"
+          ]
+        },
+        {
+          "id": "SDK-004",
+          "title": "MCP Server",
+          "priority": "P1",
+          "status": "planned",
+          "files": [
+            "mcp_server/server.py"
+          ],
+          "code": "class HarnessMCPServer:\n    async def list_tools(self):\n        return ['run_benchmark','get_run','list_providers']\n",
+          "acceptance_criteria": [
+            "Tool schemas are versioned",
+            "Authorization matches REST policy",
+            "Long-running runs support polling"
+          ]
+        }
+      ]
+    },
+    {
+      "phase": 7,
+      "stream": "Enterprise",
+      "current_state": "Planned",
+      "next_major_milestone": "Organizations, RBAC, audit logs, and approvals",
+      "features": [
+        {
+          "id": "ENT-001",
+          "title": "Organizations and Projects",
+          "priority": "P1",
+          "status": "planned",
+          "files": [
+            "domain/organizations.py",
+            "database/migrations/organizations.sql"
+          ],
+          "acceptance_criteria": [
+            "Project data is tenant-isolated",
+            "Cross-organization access is denied",
+            "Migration is idempotent"
+          ]
+        },
+        {
+          "id": "ENT-002",
+          "title": "RBAC and Approvals",
+          "priority": "P1",
+          "status": "planned",
+          "files": [
+            "security/rbac.py",
+            "security/approvals.py"
+          ],
+          "code": "class PolicyEngine:\n    def authorize(self, principal, action, resource):\n        decision = self._evaluate(principal, action, resource)\n        if not decision.allowed:\n            raise PermissionError(decision.reason)\n",
+          "acceptance_criteria": [
+            "Least-privilege defaults",
+            "Approval decisions are auditable",
+            "Policy decisions include reason codes"
+          ]
+        },
+        {
+          "id": "ENT-003",
+          "title": "Immutable Audit Logging",
+          "priority": "P1",
+          "status": "planned",
+          "files": [
+            "audit/events.py",
+            "audit/store.py",
+            "database/migrations/audit_log.sql"
+          ],
+          "code": "class AuditStore:\n    def append(self, event):\n        event.previous_hash = self._last_hash()\n        event.hash = event.compute_hash()\n        self._persist(event)\n",
+          "acceptance_criteria": [
+            "Audit records are append-only",
+            "Integrity chain is verifiable",
+            "Sensitive values are redacted"
+          ]
+        }
+      ]
+    },
+    {
+      "phase": 8,
+      "stream": "AI Optimization",
+      "current_state": "Planned",
+      "next_major_milestone": "Automatic routing, prompt optimization, and Pareto search",
+      "features": [
+        {
+          "id": "OPT-001",
+          "title": "Automatic Model Routing",
+          "priority": "P0",
+          "status": "planned",
+          "files": [
+            "routing/policy.py",
+            "routing/router.py"
+          ],
+          "code": "class Router:\n    def choose(self, candidates, constraints):\n        qualified = [c for c in candidates if constraints.accepts(c)]\n        return min(qualified, key=lambda c: (c.cost, c.latency_ms))\n",
+          "acceptance_criteria": [
+            "Capability requirements are enforced",
+            "Unknown pricing never silently wins",
+            "Routing decisions are explainable"
+          ]
+        },
+        {
+          "id": "OPT-002",
+          "title": "Prompt Optimization",
+          "priority": "P0",
+          "status": "planned",
+          "files": [
+            "optimization/prompts.py",
+            "optimization/history.py"
+          ],
+          "code": "class PromptOptimizer:\n    async def optimize(self, prompt, evaluator, budget):\n        best = prompt\n        for candidate in self._mutations(prompt, budget):\n            if await evaluator.score(candidate) > await evaluator.score(best):\n                best = candidate\n        return best\n",
+          "acceptance_criteria": [
+            "Optimization budget is enforced",
+            "Original prompt is preserved",
+            "Quality and token deltas are recorded"
+          ]
+        },
+        {
+          "id": "OPT-003",
+          "title": "Pareto Search",
+          "priority": "P1",
+          "status": "planned",
+          "files": [
+            "optimization/pareto.py"
+          ],
+          "code": "def pareto_frontier(points):\n    return [p for p in points if not any(q.dominates(p) for q in points if q is not p)]\n",
+          "acceptance_criteria": [
+            "Dominance is evaluated across all objectives",
+            "Frontier is deterministic",
+            "Tradeoffs are explained"
+          ]
+        }
+      ]
+    },
+    {
+      "phase": 9,
+      "stream": "Research",
+      "current_state": "Planned",
+      "next_major_milestone": "Continuous regression lab, model genealogy, and capability evolution",
+      "features": [
+        {
+          "id": "RES-001",
+          "title": "Continuous Regression Laboratory",
+          "priority": "P1",
+          "status": "planned",
+          "files": [
+            "research/regression_lab.py",
+            "research/scheduler.py"
+          ],
+          "code": "class RegressionLab:\n    async def compare(self, current_run, baseline_run):\n        return self._compute_deltas(current_run, baseline_run)\n",
+          "acceptance_criteria": [
+            "Regressions use statistical thresholds",
+            "Reports link to source executions",
+            "False-positive controls are documented"
+          ]
+        },
+        {
+          "id": "RES-002",
+          "title": "Model Genealogy",
+          "priority": "P1",
+          "status": "planned",
+          "files": [
+            "research/genealogy.py",
+            "database/migrations/model_genealogy.sql"
+          ],
+          "code": "class ModelGenealogy:\n    def lineage(self, model_id):\n        return self._graph.ancestors(model_id)\n",
+          "acceptance_criteria": [
+            "Version lineage is queryable",
+            "Deprecated models retain history",
+            "Discovery metadata is timestamped"
+          ]
+        },
+        {
+          "id": "RES-003",
+          "title": "Capability Evolution Analytics",
+          "priority": "P1",
+          "status": "planned",
+          "files": [
+            "research/evolution.py",
+            "analytics/trends.py"
+          ],
+          "code": "class CapabilityEvolution:\n    def analyze(self, history):\n        return self._trend_model.fit(history)\n",
+          "acceptance_criteria": [
+            "Trends cite source runs",
+            "Confidence bands are shown",
+            "Model drift is separated from benchmark drift"
+          ]
+        }
+      ]
+    }
+  ],
+  "global_quality_gates": [
+    "python -m compileall adapters runner database security src cli categories tests",
+    "python -m pytest -q",
+    "python -m cli.main validate",
+    "python -m cli.main release-check --format json --strict"
+  ]
+}
