@@ -25,11 +25,12 @@ Mission  ──▶  Principles  ──▶  Engineering Guarantees  ──▶  Ve
 3. 📉 **Detect change before reacting**: Statistically significant model drift must be detected and documented over time.
 4. 🔌 **Verify extensions before trusting them**: Dynamic plugins must pass metadata verification and credential boundary isolation.
 5. 🔒 **Observe systems without exposing sensitive data**: Telemetry scrubbers guarantee zero prompt or secret leakage across logs, traces, and metrics.
-6. 🎯 **Prefer evidence over inference**: Every architectural claim must be backed by automated tests, statistical CIs, replay manifests, or release gate verdicts.
+6. 🔑 **Enforce tenant ownership on every object reference**: Resource handles guarantee strict cross-tenant isolation and anti-enumeration.
+7. 🎯 **Prefer evidence over inference**: Every architectural claim must be backed by automated tests, statistical CIs, replay manifests, or release gate verdicts.
 
 ---
 
-## 🛡️ The Five Guarantees, Evidence Observatory & Traceable Trust Claims
+## 🛡️ The Six Guarantees, Evidence Observatory & Traceable Trust Claims
 
 | Engineering Guarantee | Verification Funnel (CI Job) | Evidence Observatory Artifact | Machine Release Gate | Verified Trust Claim |
 | :--- | :--- | :--- | :--- | :--- |
@@ -38,6 +39,7 @@ Mission  ──▶  Principles  ──▶  Engineering Guarantees  ──▶  Ve
 | 📉 **Drift Awareness** | `python -m cli.main leaderboard` | `database/harness.db` | `checks.database_integrity == true` | Statistically significant behavior and cost changes are automatically detected. |
 | 🔌 **Trusted Extensibility** | `pytest tests/unit/test_provider_plugins.py` | `plugins/plugin_manifest.json` | `checks.compilation == true` | Dynamic plugins pass interface verification and credential boundary isolation. |
 | 🔒 **Confidential Observability** | `pytest tests/unit/test_telemetry_*.py` | `telemetry/telemetry_audit.log` | `checks.telemetry_secret_safety == true` | Telemetry pipelines scrub secrets and prompts before export. |
+| 🔑 **Object Authorization** | `pytest tests/unit/test_object_authorization.py` | `reports/object_authorization.json` | `checks.object_authorization == true` | Object references enforce tenant boundaries, child-parent integrity, and 404 anti-enumeration. |
 
 ---
 

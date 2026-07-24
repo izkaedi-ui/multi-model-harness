@@ -20,9 +20,9 @@ This document serves as the authoritative, end-to-end architectural blueprint, e
 
 ---
 
-### 🛡️ The Five Engineering Guarantees & Evidence Artifacts
+### 🛡️ The Six Engineering Guarantees & Evidence Artifacts
 
-The platform guarantees five non-negotiable trust boundaries backed by empirical evidence artifacts:
+The platform guarantees six non-negotiable trust boundaries backed by empirical evidence artifacts:
 
 | Guarantee | Verification Question | Required Evidence Artifact | Release Target |
 | :--- | :--- | :--- | :--- |
@@ -31,12 +31,13 @@ The platform guarantees five non-negotiable trust boundaries backed by empirical
 | 📉 **Drift Awareness** | *Did the model silently change?* | Drift analysis report with statistical confidence | `v0.8.x` |
 | 🔌 **Trusted Extensibility** | *Can extensions be trusted?* | Plugin verification report & compatibility manifest | `v0.9.x` |
 | 🔒 **Confidential Observability** | *Did telemetry leak protected data?* | Secret-leak audit report with zero findings | `v0.9.x` |
+| 🔑 **Object Authorization** | *Can one identity access or control another identity's resources?* | Cross-tenant IDOR suite & object ownership audit report | `v0.9.x` |
 
 ---
 
 ### 🎯 The Definition of Done (v1.0.0 Machine Release Gate)
 
-The platform reaches **v1.0.0 Trustworthy Evaluation Platform** maturity when the automated release gate verifies evidence for all five guarantees:
+The platform reaches **v1.0.0 Trustworthy Evaluation Platform** maturity when the automated release gate verifies evidence for all six guarantees:
 
 ```text
 Release Gate Verification (v1.0.0 Target)
@@ -46,6 +47,7 @@ Release Gate Verification (v1.0.0 Target)
 ☑ Drift Awareness detector identifies statistically significant provider changes
 ☑ Trusted Extensibility verification passes with no credential or boundary violations
 ☑ Confidential Observability audit confirms zero prompt or secret leakage
+☑ Object Authorization & Tenant Isolation suite passes (zero cross-tenant IDOR leaks)
 ☑ Unit, integration, and regression test suites pass (100% green)
 ☑ Immutable signed release manifests generated
 ```

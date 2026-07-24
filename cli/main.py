@@ -427,6 +427,7 @@ def _collect_release_checks() -> dict[str, bool]:
         telemetry_secret_safety = False
 
     # 6. Evaluation Integrity Gate Check
+    # 6. Evaluation Integrity Check
     try:
         from security.evaluation_integrity_gate import assert_evaluation_integrity
         integrity_res = assert_evaluation_integrity("reports/judge_resistance.json")
@@ -434,7 +435,20 @@ def _collect_release_checks() -> dict[str, bool]:
     except Exception:
         evaluation_integrity = False
 
-    # 7. Git Status Check
+    # 7. Object Authorization & Tenant Isolation Check (Guarantee 6)
+    try:
+        from security.object_authorization import ObjectAuthorizationGate, IdentityContext, ResourceHandle, AccessAction, AuthorizationError
+        id_a = IdentityContext(tenant_id="t_a", user_id="u_a")
+        res_b = ResourceHandle(resource_type="run", resource_id="r_b", owner_tenant_id="t_b", owner_user_id="u_b")
+        try:
+            ObjectAuthorizationGate.authorize(id_a, res_b, AccessAction.READ)
+            object_authorization = False
+        except AuthorizationError as e:
+            object_authorization = e.status_code == 404
+    except Exception:
+        object_authorization = False
+
+    # 8. Git Status Check
     git_ok = _run_quiet_command(["git", "status", "--short"])
 
     return {
@@ -449,6 +463,7 @@ def _collect_release_checks() -> dict[str, bool]:
         "metrics_registry": metrics_registry,
         "telemetry_secret_safety": telemetry_secret_safety,
         "evaluation_integrity": evaluation_integrity,
+        "object_authorization": object_authorization,
     }
 
 
