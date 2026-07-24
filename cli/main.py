@@ -420,7 +420,15 @@ def _collect_release_checks() -> dict[str, bool]:
         metrics_registry = False
         telemetry_secret_safety = False
 
-    # 6. Git Status Check
+    # 6. Evaluation Integrity Gate Check
+    try:
+        from security.evaluation_integrity_gate import assert_evaluation_integrity
+        integrity_res = assert_evaluation_integrity("reports/judge_resistance.json")
+        evaluation_integrity = integrity_res["checks"]["evaluation_integrity"]["passed"]
+    except Exception:
+        evaluation_integrity = False
+
+    # 7. Git Status Check
     git_ok = _run_quiet_command(["git", "status", "--short"])
 
     return {
@@ -434,7 +442,9 @@ def _collect_release_checks() -> dict[str, bool]:
         "telemetry_noop": telemetry_noop,
         "metrics_registry": metrics_registry,
         "telemetry_secret_safety": telemetry_secret_safety,
+        "evaluation_integrity": evaluation_integrity,
     }
+
 
 
 
