@@ -1,16 +1,30 @@
-# Multi-Provider LLM Security Test Harness
+# Multi-Provider LLM Security & Evaluation Platform
 
-A reproducible, production-grade evaluation platform for measuring LLM safety properties
-across multiple providers — **not** a collection of prompt scripts.
+> **An AI evaluation platform built around five engineering guarantees, each backed by verifiable evidence.**
+
+---
+
+## 🏛️ The Five Engineering Guarantees
+
+| Guarantee | Verification Question | Evidence Artifact | Status |
+| :--- | :--- | :--- | :--- |
+| ⚖️ **Evaluation Integrity** | *Can the evaluation be manipulated?* | Adversarial benchmark suite & judge-resistance report | `v0.6.0` (Active) |
+| 🔄 **Reproducibility** | *Can this result be reproduced?* | Signed replay manifest & environment fingerprint | `v0.6.1` (Active) |
+| 📉 **Drift Awareness** | *Did the model silently change?* | Drift analysis report with statistical confidence | `v0.8.0` (Target) |
+| 🔌 **Trusted Extensibility** | *Can extensions be trusted?* | Plugin verification report & compatibility manifest | `v0.9.0` (Target) |
+| 🔒 **Confidential Observability** | *Did telemetry leak protected data?* | Secret-leak audit report with zero findings | `v0.6.1` (Active) |
+
+---
 
 ## Supported Providers
 
 | Provider | Adapter | Status |
 |---|---|---|
-| OpenAI | `openai_adapter.py` | ✅ Implemented |
-| Anthropic | `anthropic_adapter.py` | ✅ Implemented |
-| Google Gemini | `gemini_adapter.py` | 🔲 Stub |
-| xAI / Grok | `xai_adapter.py` | 🔲 Stub |
+| OpenAI | `OpenAIAdapter` | ✅ Native Implementation |
+| Anthropic | `AnthropicAdapter` | ✅ Native Implementation |
+| Google Gemini | `GeminiAdapter` | ✅ Native Implementation |
+| xAI / Grok | `XAIAdapter` | ✅ Native Implementation |
+
 
 ## Evaluation Categories
 
