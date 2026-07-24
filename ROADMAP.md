@@ -10,47 +10,44 @@ This document serves as the authoritative, end-to-end architectural blueprint, e
 
 ---
 
-## 🏛️ Part I — The Five Pillars Trust Model & Universal Evaluation Directive
+## 🏛️ Part I — The Five Engineering Guarantees & Evidence-Driven Trust Model
+
+> **North Star Trust Mission (v1.0.0)**:  
+> *"Build an AI evaluation platform whose results are reproducible, whose measurements are scientifically defensible, whose extensions are trustworthy, and whose observability preserves confidentiality."*
 
 > **Universal Platform Evaluation Directive**:  
 > *"Every new feature should either make the platform more **extensible**, more **reproducible**, more **observable**, or more **autonomous**."*
 
-### 🛡️ The Five Pillars Trust Model (Core Invariants)
+---
 
-The platform guarantees five non-negotiable trust boundaries:
+### 🛡️ The Five Engineering Guarantees & Evidence Artifacts
 
-1. ⚖️ **Evaluation Integrity (v0.6.x)**:  
-   - **Question**: *Can a model manipulate the evaluator, rubric, benchmark, or neighboring cases?*  
-   - **Enforcement**: Defense against judge prompt injection, score manipulation, cross-case contamination, hidden benchmark leakage, and evaluator drift.
+The platform guarantees five non-negotiable trust boundaries backed by empirical evidence artifacts:
 
-2. 🔄 **Deterministic Replay (v0.7.x)**:  
-   - **Question**: *Can a result be reproduced with the same inputs and environment?*  
-   - **Enforcement**: Signed run manifests capturing benchmark fingerprints, prompt/system hashes, model IDs, generation seeds, evaluator versions, and runtime environment hashes.
-
-3. 📉 **Capability Drift Detection (v0.8.x)**:  
-   - **Question**: *Did the provider or model change behavior without an application change?*  
-   - **Enforcement**: Continuous tracking of pass rates, refusal behavior, tool-use reliability, latency, token usage, cost, and judge agreement over time.
-
-4. 🔌 **Plugin Trust (v0.9.x)**:  
-   - **Question**: *Can an extension weaken the platform’s trust model?*  
-   - **Enforcement**: Explicit plugin metadata, API compatibility versioning, duplicate-name rejection, credential isolation, and execution failure containment.
-
-5. 🔒 **Telemetry Privacy (v0.9.x)**:  
-   - **Question**: *Are prompts, responses, credentials, or sensitive metadata leaking into observability systems?*  
-   - **Enforcement**: Automated secret redaction and attribute scrubbing ensuring zero key/prompt leakage across logs, traces, metric labels, and dashboard exports.
+| Guarantee | Verification Question | Required Evidence Artifact | Release Target |
+| :--- | :--- | :--- | :--- |
+| ⚖️ **Evaluation Integrity** | *Can the evaluation be manipulated?* | Adversarial benchmark suite & judge-resistance report | `v0.6.x` |
+| 🔄 **Reproducibility** | *Can this result be reproduced?* | Signed replay manifest & environment fingerprint | `v0.7.x` |
+| 📉 **Drift Awareness** | *Did the model silently change?* | Drift analysis report with statistical confidence | `v0.8.x` |
+| 🔌 **Trusted Extensibility** | *Can extensions be trusted?* | Plugin verification report & compatibility manifest | `v0.9.x` |
+| 🔒 **Confidential Observability** | *Did telemetry leak protected data?* | Secret-leak audit report with zero findings | `v0.9.x` |
 
 ---
 
-### 🎯 The Definition of Done (v1.0.0 Target)
+### 🎯 The Definition of Done (v1.0.0 Machine Release Gate)
 
-The platform reaches **v1.0.0 Trustworthy Evaluation Platform** maturity when it empirically answers all five trust questions with verifiable evidence:
+The platform reaches **v1.0.0 Trustworthy Evaluation Platform** maturity when the automated release gate verifies evidence for all five guarantees:
 
 ```text
-[ ] Can the evaluation be manipulated?  ──▶  NO (Protected by Evaluation Integrity)
-[ ] Can the result be reproduced?     ──▶  YES (Verified via Deterministic Replay)
-[ ] Did the model silently change?    ──▶  NO (Monitored via Drift Detection)
-[ ] Can extensions be trusted?        ──▶  YES (Gated via Plugin Contracts)
-[ ] Did sensitive data leak?          ──▶  NO (Enforced via Telemetry Privacy)
+Release Gate Verification (v1.0.0 Target)
+
+☑ Evaluation Integrity suite passes (zero judge prompt injection)
+☑ Deterministic Replay reproduces benchmark runs or reports explainable drift
+☑ Drift Awareness detector identifies statistically significant provider changes
+☑ Trusted Extensibility verification passes with no credential or boundary violations
+☑ Confidential Observability audit confirms zero prompt or secret leakage
+☑ Unit, integration, and regression test suites pass (100% green)
+☑ Immutable signed release manifests generated
 ```
 
 ---
