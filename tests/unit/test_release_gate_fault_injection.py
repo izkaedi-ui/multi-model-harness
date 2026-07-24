@@ -235,3 +235,18 @@ class TestReleaseGateFaultInjectionMatrix(unittest.TestCase):
         data = json.loads(result.output.strip())
         self.assertEqual(data["verdict"], "failed")
         self.assertFalse(data["checks"]["object_authorization"])
+
+    @patch(
+        "runner.sandboxed_evaluator.assert_evaluator_outer_wall_isolation_gate",
+        return_value={
+            "evaluator_environment_scrubbing": True,
+            "evaluator_subprocess_isolation": False,  # Fault injected!
+            "evaluator_credential_leak_prevention": True,
+        },
+    )
+    def test_fault_injection_evaluator_isolation_fails_release(self, _mock_sandbox) -> None:
+        result = self.runner.invoke(cli, ["release-check", "--format", "json", "--strict"])
+        self.assertEqual(result.exit_code, 1)
+        data = json.loads(result.output.strip())
+        self.assertEqual(data["verdict"], "failed")
+        self.assertFalse(data["checks"]["evaluator_subprocess_isolation"])

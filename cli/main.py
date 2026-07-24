@@ -477,7 +477,19 @@ def _collect_release_checks() -> dict[str, bool]:
         decision_duplicate_rejection = False
         decision_sensitive_field_exclusion = False
 
-    # 9. Git Status Check (Inspect stdout for clean working tree)
+    # 9. Outer-Wall Evaluator Isolation Check
+    try:
+        from runner.sandboxed_evaluator import assert_evaluator_outer_wall_isolation_gate
+        sandbox_gate = assert_evaluator_outer_wall_isolation_gate()
+        evaluator_environment_scrubbing = sandbox_gate["evaluator_environment_scrubbing"]
+        evaluator_subprocess_isolation = sandbox_gate["evaluator_subprocess_isolation"]
+        evaluator_credential_leak_prevention = sandbox_gate["evaluator_credential_leak_prevention"]
+    except Exception:
+        evaluator_environment_scrubbing = False
+        evaluator_subprocess_isolation = False
+        evaluator_credential_leak_prevention = False
+
+    # 10. Git Status Check (Inspect stdout for clean working tree)
     git_ok = _git_working_tree_clean()
 
     return {
@@ -504,6 +516,9 @@ def _collect_release_checks() -> dict[str, bool]:
         "decision_sequence_validation": decision_sequence_validation,
         "decision_duplicate_rejection": decision_duplicate_rejection,
         "decision_sensitive_field_exclusion": decision_sensitive_field_exclusion,
+        "evaluator_environment_scrubbing": evaluator_environment_scrubbing,
+        "evaluator_subprocess_isolation": evaluator_subprocess_isolation,
+        "evaluator_credential_leak_prevention": evaluator_credential_leak_prevention,
     }
 
 
