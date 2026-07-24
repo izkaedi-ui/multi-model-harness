@@ -86,17 +86,17 @@ class OpenAIAdapter(BaseAdapter):
         try:
             completion: ChatCompletion = await self._client.chat.completions.create(**kwargs)
         except openai.AuthenticationError as exc:
-            raise AuthenticationError(PROVIDER) from exc
+            raise AuthenticationError(self.provider_name) from exc
         except openai.RateLimitError as exc:
             retry_after = self._extract_retry_after(exc)
-            raise RateLimitError(PROVIDER, retry_after) from exc
+            raise RateLimitError(self.provider_name, retry_after) from exc
         except openai.APIStatusError as exc:
             if exc.status_code in (500, 502, 503, 504):
                 raise RetryableProviderError(
-                    PROVIDER, exc.status_code, str(exc)
+                    self.provider_name, exc.status_code, str(exc)
                 ) from exc
             raise NonRetryableProviderError(
-                PROVIDER, exc.status_code, str(exc)
+                self.provider_name, exc.status_code, str(exc)
             ) from exc
         except openai.APIConnectionError as exc:
             cause = exc.__cause__
@@ -108,14 +108,14 @@ class OpenAIAdapter(BaseAdapter):
             log.warning(
                 "openai.connection_error",
                 extra={
-                    "provider": PROVIDER,
+                    "provider": self.provider_name,
                     "model": request.model,
                     "error": str(exc),
                     "cause": cause_text,
                 },
             )
             raise RetryableProviderError(
-                PROVIDER,
+                self.provider_name,
                 None,
                 f"{exc}; cause={cause_text}",
             ) from exc
@@ -136,8 +136,7 @@ class OpenAIAdapter(BaseAdapter):
         messages.extend(request.messages)
         return messages
 
-    @staticmethod
-    def _normalise(completion: ChatCompletion, latency_ms: int) -> ModelResponse:
+    def _normalise(self, completion: ChatCompletion, latency_ms: int) -> ModelResponse:
         choice = completion.choices[0]
         message = choice.message
 
@@ -167,7 +166,7 @@ class OpenAIAdapter(BaseAdapter):
         )
 
         return ModelResponse(
-            provider=PROVIDER,
+            provider=self.provider_name,
             model=completion.model,
             text=text,
             finish_reason=choice.finish_reason,
@@ -176,6 +175,7 @@ class OpenAIAdapter(BaseAdapter):
             latency_ms=latency_ms,
             raw_response=completion.model_dump(),
         )
+
 
     @staticmethod
     def _extract_retry_after(exc: openai.RateLimitError) -> float | None:
