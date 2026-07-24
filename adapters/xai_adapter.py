@@ -13,6 +13,7 @@ import logging
 
 from adapters.base_adapter import BaseAdapter
 from adapters.auth import load_api_key
+from security_harness.errors import NotImplementedProviderError
 from security_harness.types import ModelRequest, ModelResponse
 
 log = logging.getLogger(__name__)
@@ -25,27 +26,7 @@ class XAIAdapter(BaseAdapter):
     """
     Provider adapter for the xAI Grok API.
 
-    Status: STUB — implement _generate_raw() to enable.
-
-    Implementation hint:
-        xAI uses an OpenAI-compatible API. The simplest implementation is:
-
-            from adapters.openai_adapter import OpenAIAdapter
-            import openai
-
-            class XAIAdapter(OpenAIAdapter):
-                provider_name = "xai"
-
-                def __init__(self, api_key=None, retry_config=None):
-                    super().__init__(api_key=api_key, retry_config=retry_config)
-                    key = api_key or load_api_key("xai", "XAI_API_KEY")
-                    self._client = openai.AsyncOpenAI(
-                        api_key=key,
-                        base_url="https://api.x.ai/v1",
-                    )
-
-    References:
-        https://docs.x.ai/docs
+    Status: DISABLED (Stub) — implement _generate_raw() to enable.
     """
 
     provider_name = PROVIDER
@@ -60,10 +41,9 @@ class XAIAdapter(BaseAdapter):
         log.info("XAIAdapter.init (stub)", extra={"provider": PROVIDER})
 
     async def _generate_raw(self, request: ModelRequest) -> ModelResponse:
-        # TODO: Implement using openai.AsyncOpenAI(base_url=_XAI_BASE_URL)
-        raise NotImplementedError(
-            "XAIAdapter is a stub. "
-            "See the docstring for the recommended OpenAI-compatible implementation."
+        raise NotImplementedProviderError(
+            PROVIDER,
+            "XAIAdapter is a stub. Implement _generate_raw() by extending OpenAIAdapter."
         )
 
     async def health_check(self) -> bool:

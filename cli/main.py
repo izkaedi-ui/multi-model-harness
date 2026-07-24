@@ -30,7 +30,8 @@ def cli(log_level: str, log_format: str) -> None:
 @click.option("--categories", default="guardrail_consistency", help="Comma-separated test categories")
 @click.option("--max-cases", default=50, type=int, help="Maximum test cases per model")
 @click.option("--dry-run", is_flag=True, help="Validate plan without executing requests")
-def run(providers: str, categories: str, max_cases: int, dry_run: bool) -> None:
+@click.option("--allow-partial", is_flag=True, help="Allow run to proceed if some requested providers lack API keys")
+def run(providers: str, categories: str, max_cases: int, dry_run: bool, allow_partial: bool) -> None:
     """Execute a security test run across configured providers."""
     from runner.runner import RunConfig, Runner
 
@@ -42,7 +43,9 @@ def run(providers: str, categories: str, max_cases: int, dry_run: bool) -> None:
         categories=cat_list,
         max_cases_per_model=max_cases,
         dry_run=dry_run,
+        allow_partial_providers=allow_partial,
     )
+
 
     runner = Runner(config)
     result = asyncio.run(runner.run())

@@ -13,6 +13,7 @@ import logging
 
 from adapters.base_adapter import BaseAdapter
 from adapters.auth import load_api_key
+from security_harness.errors import NotImplementedProviderError
 from security_harness.types import ModelRequest, ModelResponse
 
 log = logging.getLogger(__name__)
@@ -24,7 +25,7 @@ class GeminiAdapter(BaseAdapter):
     """
     Provider adapter for the Google Gemini API.
 
-    Status: STUB — implement _generate_raw() to enable.
+    Status: DISABLED (Stub) — implement _generate_raw() to enable.
 
     References:
         https://ai.google.dev/api/python/google/generativeai
@@ -42,15 +43,11 @@ class GeminiAdapter(BaseAdapter):
         log.info("GeminiAdapter.init (stub)", extra={"provider": PROVIDER})
 
     async def _generate_raw(self, request: ModelRequest) -> ModelResponse:
-        # TODO: Install google-generativeai and implement.
-        # import google.generativeai as genai
-        # genai.configure(api_key=self._api_key)
-        # model = genai.GenerativeModel(request.model)
-        # response = await model.generate_content_async(...)
-        raise NotImplementedError(
-            "GeminiAdapter is a stub. "
-            "Install google-generativeai and implement _generate_raw()."
+        raise NotImplementedProviderError(
+            PROVIDER,
+            "GeminiAdapter is a stub. Install google-generativeai and implement _generate_raw()."
         )
+
 
     async def health_check(self) -> bool:
         log.warning("GeminiAdapter.health_check: stub — returning False")

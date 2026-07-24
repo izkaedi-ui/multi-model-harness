@@ -69,9 +69,15 @@ class OpenAIAdapter(BaseAdapter):
         kwargs: dict[str, Any] = {
             "model": request.model,
             "messages": self._build_messages(request),
-            "temperature": request.temperature,
-            "max_tokens": request.max_output_tokens,
         }
+
+        # Reasoning models (o1, o3, etc.) use max_completion_tokens and do not support temperature
+        if request.model.startswith(("o1", "o3")):
+            kwargs["max_completion_tokens"] = request.max_output_tokens
+        else:
+            kwargs["temperature"] = request.temperature
+            kwargs["max_tokens"] = request.max_output_tokens
+
 
         if request.tools:
             kwargs["tools"] = list(request.tools)

@@ -61,6 +61,7 @@ class RunConfig:
     max_concurrent: int = 4
     budget_config: dict = field(default_factory=dict)
     dry_run: bool = False
+    allow_partial_providers: bool = False
 
 
 @dataclass
@@ -104,11 +105,21 @@ class Runner:
             # Step 1-2: Load config + validate credentials
             budget_cfg = self._load_budget_config()
             available = available_providers()
+            missing = [p for p in self._config.providers if p not in available]
+
+            if missing and not self._config.allow_partial_providers:
+                log.error("runner.missing_providers", extra={"missing": missing, "available": available})
+                raise MissingApiKeyError(
+                    provider=", ".join(missing),
+                    env_var=f"API keys missing for requested provider(s): {', '.join(missing)}. Pass --allow-partial to proceed without them."
+                )
+
             requested = [p for p in self._config.providers if p in available]
             if not requested:
                 log.error("runner.no_providers", extra={"requested": self._config.providers,
                                                          "available": available})
                 raise RuntimeError("No providers available with valid API keys.")
+
 
             # Step 3: Load test cases
             category_registry = CategoryRegistry.default()

@@ -61,3 +61,7 @@ SELECT
 
 # Local manifests (optional)
 harness-manifest.csv
+# Accidental SQLite shell artifacts
+.schema
+.tables
+SELECT
