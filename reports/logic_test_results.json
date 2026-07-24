@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "suite": "evaluation_integrity",
+  "repository_commit": "3efd972",
+  "environment": {
+    "python": "3.14.3",
+    "platform": "win32"
+  },
+  "tests": {
+    "collected": 157,
+    "passed": 157,
+    "failed": 0,
+    "skipped": 0
+  },
+  "gates": {
+    "schema_validation": "pass",
+    "prompt_injection_resistance": "pass",
+    "cross_case_isolation": "pass",
+    "report_integrity": "pass",
+    "release_cli": "pass",
+    "full_regression": "pass"
+  },
+  "failures": [],
+  "unrun_checks": [],
+  "release_eligible": true
+}
