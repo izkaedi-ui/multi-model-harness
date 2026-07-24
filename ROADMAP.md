@@ -252,3 +252,37 @@ python -m cli.main run --providers openai,anthropic,gemini,xai --categories guar
 # 7. Execute Unit & Integration Test Suite
 python -m pytest -v
 ```
+
+---
+
+## 🏛️ Part VI — Capability Streams Matrix & Enterprise Governance
+
+### 1. Enterprise Capability Streams
+
+| Capability Stream | Current State | Next Major Milestone |
+|---|---|---|
+| **Provider Platform** | Strong (4 Live Adapters) | Dynamic provider plugins & automatic capability discovery |
+| **Benchmark Engine** | Good (YAML Categories) | Declarative Scenario DSL, synthetic benchmark generation, dataset versioning |
+| **Evaluation Engine** | Good (Deterministic) | Statistical confidence intervals, judge ensembles, cross-model verification |
+| **Observability** | Basic (Structured Logs) | OpenTelemetry integration, Prometheus metrics endpoint, Grafana dashboards |
+| **Infrastructure** | Basic (Async Local Engine) | Distributed coordinator/workers, Redis queues, Kubernetes worker pools |
+| **SDKs & Interfaces** | Minimal (Click CLI) | Python SDK, TypeScript SDK, REST API, native MCP integration |
+| **Enterprise Governance** | Planned | RBAC, multi-tenant organizations, audit logs, policy approvals |
+| **AI Optimization** | Planned | Automated model routing, prompt optimization, Pareto search |
+| **Research Laboratory** | Planned | Continuous regression lab, model genealogy, capability evolution |
+
+---
+
+### 2. Governance & Reproducibility Controls
+
+To ensure forensic integrity and strict auditability, the platform enforces eight enterprise governance controls:
+
+- **Immutable Run Manifests**: Every run generates a signed `manifest_<run_id>.json` capturing environment hash, python runtime, OS platform, and provider configuration hashes.
+- **Dataset Versioning**: Semantic versioning for benchmark test cases (`version: 1.0.0`) with content hash checking (`content_hash`).
+- **Prompt Versioning**: Immutable prompt IDs allowing exact historical prompt retrieval and A/B comparison.
+- **Evaluation Schema Versioning**: Explicit schema version tags (`harness_version: 0.1.0`) ensuring backwards-compatible JSON reporting.
+- **Deterministic Replay**: Ability to re-execute any past run using exact cached prompts and configuration hashes (`cli.main replay <run_id>`).
+- **Signed Benchmark Releases**: Cryptographically signed release tags for benchmark suites preventing unauthorized scenario tampering.
+- **Reproducibility Reports**: Automated audit reports comparing current run outputs against historical baselines.
+- **Supply-Chain Plugin Verification**: Checksum verification and least-privilege credential sandboxing for all third-party provider/scorer plugins.
+
