@@ -5,7 +5,23 @@ before they are exported or shared.
 from __future__ import annotations
 import pathlib
 from security_harness.errors import SecretLeakDetected
-from security_harness.security.secret_redactor import SecretRedactor  # type: ignore[import]
+from security.secret_redactor import SecretRedactor
+
+
+class ArtifactScanner:
+    """Class wrapper for scanning artifacts and raw text for secret leakage."""
+
+    def __init__(self, redactor: SecretRedactor | None = None) -> None:
+        self.redactor = redactor or SecretRedactor.default()
+
+    @classmethod
+    def default(cls) -> "ArtifactScanner":
+        return cls(SecretRedactor.default())
+
+    def scan_text(self, text: str, extension: str = ".txt") -> bool:
+        """Return True if text is clean (no secrets detected), False otherwise."""
+        return self.redactor.is_clean(text)
+
 
 def scan_artifact(path: pathlib.Path, redactor: SecretRedactor | None = None) -> None:
     """

@@ -42,8 +42,24 @@ class TestSecretRedactor(unittest.TestCase):
         self.assertEqual(redacted["api_key"], "[REDACTED]")
         self.assertEqual(redacted["public_field"], "public_data")
 
+    def test_redact_nested_lists_and_dicts(self):
+        data = {
+            "meta": {"token": "secret_token_123"},
+            "headers": ["Bearer secret_token_xyz_1234567890", {"api-key": "sk-1234567890abcdefghijklmnopqrstuvwxyz123456"}]
+        }
+        redacted = self.redactor.redact_dict(data)
+        self.assertEqual(redacted["meta"]["token"], "[REDACTED]")
+        self.assertEqual(redacted["headers"][1]["api-key"], "[REDACTED]")
+
+    def test_redact_json_string(self):
+        raw_json = '{"auth": "Bearer secret_token_xyz_1234567890", "key": "sk-1234567890abcdefghijklmnopqrstuvwxyz123456"}'
+        redacted_json = self.redactor.redact_json(raw_json)
+        self.assertNotIn("sk-1234567890abcdef", redacted_json)
+        self.assertIn("[OPENAI-KEY-REDACTED]", redacted_json)
+
     def test_is_clean(self):
         clean_text = "Standard evaluation prompt response without credentials."
         dirty_text = "Here is sk-1234567890abcdefghijklmnopqrstuvwxyz123456"
         self.assertTrue(self.redactor.is_clean(clean_text))
         self.assertFalse(self.redactor.is_clean(dirty_text))
+

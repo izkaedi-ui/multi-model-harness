@@ -105,3 +105,25 @@ class TestAnthropicAdapter(unittest.IsolatedAsyncioTestCase):
         adapter = AnthropicAdapter()
         self.assertEqual(adapter.provider_name, "anthropic")
         await adapter.close()
+
+
+class TestGeminiAdapter(unittest.IsolatedAsyncioTestCase):
+    @patch.dict(os.environ, {"GOOGLE_API_KEY": "AIzaSyFakeKey", **ENV_MOCK}, clear=False)
+    async def test_gemini_identity_and_max_retries_zero(self):
+        from adapters.gemini_adapter import GeminiAdapter
+        adapter = GeminiAdapter()
+        self.assertEqual(adapter.provider_name, "google")
+        self.assertEqual(adapter._client.max_retries, 0)
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 401
+        err = openai.AuthenticationError("Invalid Google key", response=mock_resp, body=None)
+
+        adapter._client.chat.completions.create = AsyncMock(side_effect=err)
+        req = _make_request("gemini-3.6-flash")
+
+        with self.assertRaises(AuthenticationError) as ctx:
+            await adapter.generate(req)
+        self.assertEqual(ctx.exception.provider, "google")
+        await adapter.close()
+
