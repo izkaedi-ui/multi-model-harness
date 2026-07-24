@@ -223,7 +223,28 @@ def leaderboard() -> None:
         click.echo(f"[ERROR] Failed to query leaderboard: {e}")
 
 
+@cli.command()
+def optimize() -> None:
+    """Perform database vacuuming, WAL checkpointing, and index optimization."""
+    import sqlite3
+
+    click.echo("--- Multi-Provider Harness System Optimization ---")
+    try:
+        conn = sqlite3.connect("harness.db")
+        click.echo("[1/3] Executing WAL checkpoint...")
+        conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+        click.echo("[2/3] Optimizing query planner indexes...")
+        conn.execute("PRAGMA optimize")
+        click.echo("[3/3] Vacuuming database storage...")
+        conn.execute("VACUUM")
+        conn.close()
+        click.echo("\n[OK] Database and storage optimization complete.")
+    except Exception as e:
+        click.echo(f"[ERROR] Optimization failed: {e}")
+
+
 if __name__ == "__main__":
     cli()
+
 
 
