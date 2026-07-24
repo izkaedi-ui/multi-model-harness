@@ -212,9 +212,16 @@ class Runner:
                         self._metrics.record_error(provider, "budget_exceeded")
                     except Exception as exc:
                         log.error("runner.execution_failed",
-                                  extra={"test_case": test_case.id, "error": str(exc)})
+                                  extra={
+                                      "provider": provider,
+                                      "model": request.model,
+                                      "test_case": test_case.id,
+                                      "error_type": type(exc).__name__,
+                                      "error": str(exc),
+                                  })
                         results.append((test_case, exc))
                         self._metrics.record_error(provider, type(exc).__name__)
+
 
             await asyncio.gather(*[_dispatch(item) for item in plan.items])
 
