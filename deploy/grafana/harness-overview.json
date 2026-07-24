@@ -1,0 +1,59 @@
+{
+  "$schema": "https://grafana.com/meta/dashboard.json",
+  "title": "Multi-Model Harness — Observability & Telemetry Overview",
+  "tags": ["harness", "llm", "security", "telemetry"],
+  "timezone": "browser",
+  "schemaVersion": 36,
+  "version": 1,
+  "refresh": "5s",
+  "panels": [
+    {
+      "id": 1,
+      "title": "Provider Request Rate (req/sec)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum by (provider, model) (rate(harness_requests_total[5m]))",
+          "legendFormat": "{{provider}} / {{model}}"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Provider Error Rate (%)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum by (provider, model) (rate(harness_requests_total{status!=\"success\"}[5m])) / sum by (provider, model) (rate(harness_requests_total[5m])) * 100",
+          "legendFormat": "{{provider}} / {{model}}"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "P95 Request Latency (seconds)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (le, provider, model) (rate(harness_request_latency_seconds_bucket[5m])))",
+          "legendFormat": "P95 {{provider}} / {{model}}"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "24h Provider Cost (USD)",
+      "type": "stat",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "targets": [
+        {
+          "expr": "sum by (provider) (increase(harness_cost_usd_total[24h]))",
+          "legendFormat": "{{provider}}"
+        }
+      ]
+    }
+  ]
+}

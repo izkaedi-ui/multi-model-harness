@@ -1,0 +1,21 @@
+# Telemetry Configuration Defaults
+
+enabled: false
+
+service_name: multi-model-harness
+service_version: "0.6.0"
+
+traces:
+  enabled: false
+  exporter: none
+  otlp_endpoint: null
+
+metrics:
+  enabled: false
+  host: 127.0.0.1
+  port: 9464
+
+privacy:
+  include_prompt_content: false
+  include_response_content: false
+  include_exception_messages: false

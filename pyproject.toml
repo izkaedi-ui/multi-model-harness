@@ -73,8 +73,10 @@ packages = [
   "evaluation",
   "security",
   "reports",
-  "cli"
+  "cli",
+  "telemetry"
 ]
+
 
 [tool.ruff]
 target-version = "py311"

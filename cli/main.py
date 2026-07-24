@@ -377,7 +377,24 @@ def _collect_release_checks() -> dict[str, bool]:
     except Exception:
         db_ok = False
 
-    # 5. Git Status Check
+    # 5. Telemetry & Observability Verification
+    try:
+        from telemetry.config import TelemetryConfig
+        from telemetry.tracing import TracingRuntime, NullSpan
+        from telemetry.metrics import MetricsRuntime
+        from telemetry.redaction import safe_attributes
+
+        telemetry_import = True
+        telemetry_noop = isinstance(TracingRuntime(enabled=False).span("test").__enter__(), NullSpan)
+        metrics_registry = isinstance(MetricsRuntime(), MetricsRuntime)
+        telemetry_secret_safety = safe_attributes({"api_key": "secret", "provider": "openai"}) == {"provider": "openai"}
+    except Exception:
+        telemetry_import = False
+        telemetry_noop = False
+        metrics_registry = False
+        telemetry_secret_safety = False
+
+    # 6. Git Status Check
     git_ok = _run_quiet_command(["git", "status", "--short"])
 
     return {
@@ -387,7 +404,12 @@ def _collect_release_checks() -> dict[str, bool]:
         "database_integrity": db_ok,
         "git_clean": git_ok,
         "benchmark_dsl": bool(dsl_ok),
+        "telemetry_import": telemetry_import,
+        "telemetry_noop": telemetry_noop,
+        "metrics_registry": metrics_registry,
+        "telemetry_secret_safety": telemetry_secret_safety,
     }
+
 
 
 
