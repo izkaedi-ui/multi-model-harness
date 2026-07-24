@@ -448,7 +448,17 @@ def _collect_release_checks() -> dict[str, bool]:
     except Exception:
         object_authorization = False
 
-    # 8. Git Status Check
+    # 8. Decision Provenance & Cryptographic Audit Check
+    try:
+        from security.decision_provenance import DecisionRecord
+        rec = DecisionRecord.create(
+            decision_id="d1", correlation_id="c1", tenant_id="t1", user_id="u1", resource_id="r1", action="READ", verdict="ALLOW"
+        )
+        decision_provenance = rec.verify()
+    except Exception:
+        decision_provenance = False
+
+    # 9. Git Status Check
     git_ok = _run_quiet_command(["git", "status", "--short"])
 
     return {
@@ -464,6 +474,7 @@ def _collect_release_checks() -> dict[str, bool]:
         "telemetry_secret_safety": telemetry_secret_safety,
         "evaluation_integrity": evaluation_integrity,
         "object_authorization": object_authorization,
+        "decision_provenance": decision_provenance,
     }
 
 

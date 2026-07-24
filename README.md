@@ -40,6 +40,7 @@ Mission  ──▶  Principles  ──▶  Engineering Guarantees  ──▶  Ve
 | 🔌 **Trusted Extensibility** | `pytest tests/unit/test_provider_plugins.py` | `plugins/plugin_manifest.json` | `checks.compilation == true` | Dynamic plugins pass interface verification and credential boundary isolation. |
 | 🔒 **Confidential Observability** | `pytest tests/unit/test_telemetry_*.py` | `telemetry/telemetry_audit.log` | `checks.telemetry_secret_safety == true` | Telemetry pipelines scrub secrets and prompts before export. |
 | 🔑 **Object Authorization** | `pytest tests/unit/test_object_authorization.py` | `reports/object_authorization.json` | `checks.object_authorization == true` | Object references enforce tenant boundaries, child-parent integrity, and 404 anti-enumeration. |
+| 📜 **Decision Provenance** | `pytest tests/unit/test_decision_provenance.py` | `reports/decision_provenance.json` | `checks.decision_provenance == true` | Every authorization and evaluation decision is cryptographically hashed and verifiable. |
 
 ---
 
