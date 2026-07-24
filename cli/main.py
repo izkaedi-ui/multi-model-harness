@@ -450,13 +450,27 @@ def _collect_release_checks() -> dict[str, bool]:
 
     # 8. Decision Provenance & Cryptographic Audit Check
     try:
-        from security.decision_provenance import DecisionRecord
-        rec = DecisionRecord.create(
-            decision_id="d1", correlation_id="c1", tenant_id="t1", user_id="u1", resource_id="r1", action="READ", verdict="ALLOW"
-        )
-        decision_provenance = rec.verify()
+        from security.decision_provenance import assert_decision_provenance_gate
+        prov_gate = assert_decision_provenance_gate()
+        decision_provenance = all(prov_gate.values())
+        decision_schema_validation = prov_gate["decision_schema_validation"]
+        decision_canonicalization = prov_gate["decision_canonicalization"]
+        decision_digest_verification = prov_gate["decision_digest_verification"]
+        decision_signature_verification = prov_gate["decision_signature_verification"]
+        decision_chain_integrity = prov_gate["decision_chain_integrity"]
+        decision_sequence_validation = prov_gate["decision_sequence_validation"]
+        decision_duplicate_rejection = prov_gate["decision_duplicate_rejection"]
+        decision_sensitive_field_exclusion = prov_gate["decision_sensitive_field_exclusion"]
     except Exception:
         decision_provenance = False
+        decision_schema_validation = False
+        decision_canonicalization = False
+        decision_digest_verification = False
+        decision_signature_verification = False
+        decision_chain_integrity = False
+        decision_sequence_validation = False
+        decision_duplicate_rejection = False
+        decision_sensitive_field_exclusion = False
 
     # 9. Git Status Check
     git_ok = _run_quiet_command(["git", "status", "--short"])
@@ -475,6 +489,14 @@ def _collect_release_checks() -> dict[str, bool]:
         "evaluation_integrity": evaluation_integrity,
         "object_authorization": object_authorization,
         "decision_provenance": decision_provenance,
+        "decision_schema_validation": decision_schema_validation,
+        "decision_canonicalization": decision_canonicalization,
+        "decision_digest_verification": decision_digest_verification,
+        "decision_signature_verification": decision_signature_verification,
+        "decision_chain_integrity": decision_chain_integrity,
+        "decision_sequence_validation": decision_sequence_validation,
+        "decision_duplicate_rejection": decision_duplicate_rejection,
+        "decision_sensitive_field_exclusion": decision_sensitive_field_exclusion,
     }
 
 
