@@ -345,20 +345,30 @@ def release_check(fmt: str, strict: bool) -> None:
 
     # 2. Pytest Unit Tests
     try:
-        res = subprocess.run([sys.executable, "-m", "pytest", "-q"], capture_output=True, text=True, check=True)
-        results["unit_tests"] = True
+        import pytest
+        import io
+        import contextlib
+        # Suppress pytest stdout during json mode to keep stdout 100% JSON pure
+        out_buf = io.StringIO()
+        with contextlib.redirect_stdout(out_buf), contextlib.redirect_stderr(out_buf):
+            ret = pytest.main(["-q", "tests"])
+        test_ok = (ret == 0)
+        results["unit_tests"] = test_ok
         if fmt == "text":
             click.echo("2. Running Unit Test Suite...")
-            click.echo("   -> Unit Tests: PASS (16 passed)")
+            click.echo(f"   -> Unit Tests: {'PASS' if test_ok else 'FAIL'}")
     except Exception as e:
         results["unit_tests"] = False
         if fmt == "text":
             click.echo("2. Running Unit Test Suite...")
             click.echo(f"   -> Unit Tests: FAIL ({e})")
 
+
     # 3. YAML Configuration Validation
     try:
-        res = subprocess.run([sys.executable, "-m", "cli.main", "validate"], capture_output=True, text=True, check=True)
+        from cli.main import validate as validate_cmd
+        ctx = click.get_current_context()
+        ctx.invoke(validate_cmd)
         results["validation"] = True
         if fmt == "text":
             click.echo("3. Validating Configuration and Scenarios...")
@@ -368,6 +378,7 @@ def release_check(fmt: str, strict: bool) -> None:
         if fmt == "text":
             click.echo("3. Validating Configuration and Scenarios...")
             click.echo(f"   -> Validation: FAIL ({e})")
+
 
     # 4. SQLite Database Integrity
     try:
