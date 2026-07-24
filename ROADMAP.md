@@ -10,31 +10,48 @@ This document serves as the authoritative, end-to-end architectural blueprint, e
 
 ---
 
-## 🏛️ Part I — The Five Omega Core Principles & Universal Evaluation Directive
+## 🏛️ Part I — The Five Pillars Trust Model & Universal Evaluation Directive
 
 > **Universal Platform Evaluation Directive**:  
 > *"Every new feature should either make the platform more **extensible**, more **reproducible**, more **observable**, or more **autonomous**."*
 
-Every past, present, and future commit to this repository is bound by five foundational design invariants:
+### 🛡️ The Five Pillars Trust Model (Core Invariants)
 
-1. 📊 **Evidence Over Assumptions (Forensic Correctness & Reproducibility)**:
-   - Every metric, latency claim, cost calculation, and pass/fail verdict MUST be backed by raw, un-truncated execution data stored in `harness.db` and reproducible via `manifest_<run_id>.json`.
-   - Hardcoded success claims, unverified mock test passes, or swallowed exceptions are strictly prohibited.
+The platform guarantees five non-negotiable trust boundaries:
 
-2. 🔄 **Provider Identity Preservation & Extensibility**:
-   - Models and vendors remain strictly modular behind unified provider interfaces (`OpenAIAdapter`, `AnthropicAdapter`, `GeminiAdapter`, `XAIAdapter`, and dynamic entry-point plugins).
-   - Error mapping and normalization logic MUST preserve the underlying subclass identity (e.g. exceptions from xAI endpoints MUST emit `provider='xai'` instead of defaulting to `openai`).
+1. ⚖️ **Evaluation Integrity (v0.6.x)**:  
+   - **Question**: *Can a model manipulate the evaluator, rubric, benchmark, or neighboring cases?*  
+   - **Enforcement**: Defense against judge prompt injection, score manipulation, cross-case contamination, hidden benchmark leakage, and evaluator drift.
 
-3. ⚖️ **Multi-Objective Policy Optimization & Cost Intelligence**:
-   - Execution routing, model selection, and concurrency are dynamically balanced across four competing variables: **Quality Score**, **Latency (P50/P95)**, **Cost (USD)**, and **Reliability (Retry Rate)**.
-   - Dynamic scheduling selects the lowest-cost model capable of satisfying a given benchmark's capability threshold.
+2. 🔄 **Deterministic Replay (v0.7.x)**:  
+   - **Question**: *Can a result be reproduced with the same inputs and environment?*  
+   - **Enforcement**: Signed run manifests capturing benchmark fingerprints, prompt/system hashes, model IDs, generation seeds, evaluator versions, and runtime environment hashes.
 
-4. 👁️ **Full Observability & Metric Rigor**:
-   - Every pipeline run captures structured logs, OpenTelemetry context traces, latency percentiles, and execution manifests for 100% operational transparency.
+3. 📉 **Capability Drift Detection (v0.8.x)**:  
+   - **Question**: *Did the provider or model change behavior without an application change?*  
+   - **Enforcement**: Continuous tracking of pass rates, refusal behavior, tool-use reliability, latency, token usage, cost, and judge agreement over time.
 
-5. 🛡️ **Human-Governed Autonomy & Self-Improvement**:
-   - The system continuously automates background model discovery, health checks, benchmarking, and cost optimization.
-   - High-impact operational changes (production deployments, git merges, model deprecation overrides) remain subject to explicit human review while enabling autonomous benchmark evolution.
+4. 🔌 **Plugin Trust (v0.9.x)**:  
+   - **Question**: *Can an extension weaken the platform’s trust model?*  
+   - **Enforcement**: Explicit plugin metadata, API compatibility versioning, duplicate-name rejection, credential isolation, and execution failure containment.
+
+5. 🔒 **Telemetry Privacy (v0.9.x)**:  
+   - **Question**: *Are prompts, responses, credentials, or sensitive metadata leaking into observability systems?*  
+   - **Enforcement**: Automated secret redaction and attribute scrubbing ensuring zero key/prompt leakage across logs, traces, metric labels, and dashboard exports.
+
+---
+
+### 🎯 The Definition of Done (v1.0.0 Target)
+
+The platform reaches **v1.0.0 Trustworthy Evaluation Platform** maturity when it empirically answers all five trust questions with verifiable evidence:
+
+```text
+[ ] Can the evaluation be manipulated?  ──▶  NO (Protected by Evaluation Integrity)
+[ ] Can the result be reproduced?     ──▶  YES (Verified via Deterministic Replay)
+[ ] Did the model silently change?    ──▶  NO (Monitored via Drift Detection)
+[ ] Can extensions be trusted?        ──▶  YES (Gated via Plugin Contracts)
+[ ] Did sensitive data leak?          ──▶  NO (Enforced via Telemetry Privacy)
+```
 
 ---
 
