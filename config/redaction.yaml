@@ -24,17 +24,18 @@ sensitive_field_names:
 # Regex patterns applied to string values (matched pattern replaced with [REDACTED])
 # Each pattern should be as narrow as possible to avoid over-redaction.
 value_patterns:
+  # Anthropic API key format (place before generic sk- pattern)
+  - pattern: 'sk-ant-[A-Za-z0-9_-]{20,}'
+    replacement: "[ANTHROPIC-KEY-REDACTED]"
+
   # OpenAI API key format
   - pattern: 'sk-[A-Za-z0-9_-]{20,}'
     replacement: "[OPENAI-KEY-REDACTED]"
 
-  # Anthropic API key format
-  - pattern: 'sk-ant-[A-Za-z0-9_-]{20,}'
-    replacement: "[ANTHROPIC-KEY-REDACTED]"
-
   # Google API key format
   - pattern: 'AIza[A-Za-z0-9_-]{35}'
     replacement: "[GOOGLE-KEY-REDACTED]"
+
 
   # Generic bearer token in Authorization header
   - pattern: 'Bearer\s+[A-Za-z0-9._-]{20,}'
