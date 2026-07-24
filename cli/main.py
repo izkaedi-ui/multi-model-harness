@@ -39,11 +39,13 @@ def run(providers: str, categories: str, max_cases: int, dry_run: bool, allow_pa
         "gemini": "google",
     }
 
-    prov_list = [
+    raw_prov_list = [
         provider_aliases.get(provider.strip().lower(), provider.strip().lower())
         for provider in providers.split(",")
         if provider.strip()
     ]
+    prov_list = list(dict.fromkeys(raw_prov_list))
+
 
     cat_list = [
         category.strip()

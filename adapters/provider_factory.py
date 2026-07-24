@@ -115,11 +115,12 @@ def build_all_adapters(
     return adapters
 
 
-def _get_env_key(provider: str) -> str | None:
-    """Return the environment variable name for a provider's API key."""
+def _get_env_key(provider: str) -> str | list[str] | None:
+    """Return the environment variable name(s) for a provider's API key."""
     try:
         with open("config/providers.yaml") as f:
             config = yaml.safe_load(f) or {}
         return config.get(provider, {}).get("env_key")
     except FileNotFoundError:
         return None
+

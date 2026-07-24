@@ -20,29 +20,32 @@ load_dotenv()
 
 
 
-def load_api_key(provider: str, env_var: str) -> str:
+def load_api_key(provider: str, env_var: str | list[str]) -> str:
     """
-    Load an API key from an environment variable.
+    Load an API key from environment variable(s).
 
     Args:
         provider: Human-readable provider name (e.g., "openai"). Used in error messages only.
-        env_var:  Name of the environment variable (e.g., "OPENAI_API_KEY").
+        env_var:  Single env var name or ordered list of fallback env var names.
 
     Returns:
         The API key value.
 
     Raises:
-        MissingApiKeyError: If the environment variable is unset or empty.
+        MissingApiKeyError: If no specified environment variable is set or non-empty.
     """
-    value = os.environ.get(env_var, "").strip()
-    if not value:
-        raise MissingApiKeyError(provider=provider, env_var=env_var)
-    return value
+    vars_to_check = [env_var] if isinstance(env_var, str) else env_var
+    for var in vars_to_check:
+        value = os.environ.get(var, "").strip()
+        if value:
+            return value
+    raise MissingApiKeyError(provider=provider, env_var=" / ".join(vars_to_check))
 
 
-def has_api_key(env_var: str) -> bool:
-    """Return True if the environment variable is set and non-empty."""
-    return bool(os.environ.get(env_var, "").strip())
+def has_api_key(env_var: str | list[str]) -> bool:
+    """Return True if any of the specified environment variables is set and non-empty."""
+    vars_to_check = [env_var] if isinstance(env_var, str) else env_var
+    return any(bool(os.environ.get(v, "").strip()) for v in vars_to_check)
 
 
 def available_providers() -> list[str]:
@@ -51,10 +54,11 @@ def available_providers() -> list[str]:
 
     Useful for skipping providers that have no credentials configured.
     """
-    checks = {
+    checks: dict[str, str | list[str]] = {
         "openai": "OPENAI_API_KEY",
         "anthropic": "ANTHROPIC_API_KEY",
-        "google": "GOOGLE_API_KEY",
+        "google": ["GOOGLE_API_KEY", "GEMINI_API_KEY"],
         "xai": "XAI_API_KEY",
     }
     return [name for name, var in checks.items() if has_api_key(var)]
+
