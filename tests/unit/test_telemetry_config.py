@@ -1,6 +1,7 @@
 # tests/unit/test_telemetry_config.py
 
 import pytest
+
 from telemetry.config import TelemetryConfig, load_telemetry_config
 
 

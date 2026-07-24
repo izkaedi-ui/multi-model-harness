@@ -4,18 +4,15 @@ and artifact scanner scrubbing.
 """
 from __future__ import annotations
 
+import json
 import unittest
 from unittest.mock import patch
-import os
-import json
-import sqlite3
 
 from click.testing import CliRunner
-from cli.main import cli
-from database.repository import HarnessRepository
-from database.transactions import async_transaction
-from security.artifact_scanner import ArtifactScanner
+
 from adapters.cost_estimator import estimate_cost_usd
+from cli.main import cli
+from security.artifact_scanner import ArtifactScanner
 
 
 class TestCLIMachineReadablePurity(unittest.TestCase):
@@ -59,6 +56,7 @@ class TestCLIMachineReadablePurity(unittest.TestCase):
 
     def test_write_json_stdout_bypasses_click_console_layer(self):
         import io
+
         from cli.main import _write_json_stdout
         stream = io.StringIO()
         with patch("sys.stdout", stream):

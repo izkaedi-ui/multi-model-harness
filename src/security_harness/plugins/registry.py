@@ -5,9 +5,7 @@ from __future__ import annotations
 
 import logging
 from importlib.metadata import entry_points
-from typing import Dict, Any, Optional
-
-from src.security_harness.plugins.contracts import PluginMetadata, ProviderPluginProtocol
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +17,7 @@ class PluginRegistry:
 
     def __init__(self, entry_point_group: str = ENTRY_POINT_GROUP) -> None:
         self.entry_point_group = entry_point_group
-        self._loaded_plugins: Dict[str, Any] = {}
+        self._loaded_plugins: dict[str, Any] = {}
 
     def discover(self) -> list[str]:
         """Return list of discovered plugin names in the entry point group."""
@@ -30,7 +28,7 @@ class PluginRegistry:
             logger.warning(f"Error discovering plugins for group {self.entry_point_group}: {e}")
             return []
 
-    def load_plugin(self, name: str) -> Optional[Any]:
+    def load_plugin(self, name: str) -> Any | None:
         """Load and return a single provider plugin by name."""
         if name in self._loaded_plugins:
             return self._loaded_plugins[name]
@@ -50,7 +48,7 @@ class PluginRegistry:
             logger.error(f"Failed to load provider plugin '{name}': {e}")
             return None
 
-    def load_all(self) -> Dict[str, Any]:
+    def load_all(self) -> dict[str, Any]:
         """Discover and load all registered provider plugins."""
         for name in self.discover():
             self.load_plugin(name)

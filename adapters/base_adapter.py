@@ -17,9 +17,9 @@ import yaml
 
 from security_harness.clock import timed_ms
 from security_harness.errors import (
+    NonRetryableProviderError,
     ProviderTimeoutError,
     RetryableProviderError,
-    NonRetryableProviderError,
 )
 from security_harness.types import ModelRequest, ModelResponse
 
@@ -119,7 +119,7 @@ class BaseAdapter(ABC):
                 )
                 return response
 
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 last_error = ProviderTimeoutError(self.provider_name, self._timeout)
                 log.warning(
                     "generate.timeout",

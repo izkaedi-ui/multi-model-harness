@@ -1,6 +1,8 @@
 """Output sanitizer — strips control characters and oversized payloads from model responses."""
 from __future__ import annotations
-import re, unicodedata
+
+import re
+import unicodedata
 
 _CONTROL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 

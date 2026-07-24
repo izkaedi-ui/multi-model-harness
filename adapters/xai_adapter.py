@@ -10,7 +10,6 @@ Authentication: XAI_API_KEY environment variable.
 from __future__ import annotations
 
 import logging
-from typing import Any
 
 import openai
 

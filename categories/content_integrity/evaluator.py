@@ -1,6 +1,9 @@
 """Content Integrity evaluator — JSON schema validation, markup safety, citation checks."""
 from __future__ import annotations
-import json, re
+
+import json
+import re
+
 from categories.base import BaseEvaluator
 from security_harness.types import ModelResponse, Score, TestCase
 

@@ -75,7 +75,7 @@ class RateLimiter:
         self._buckets = buckets
 
     @classmethod
-    def from_config(cls, config_path: str = "config/providers.yaml") -> "RateLimiter":
+    def from_config(cls, config_path: str = "config/providers.yaml") -> RateLimiter:
         """Build a RateLimiter from providers.yaml."""
         try:
             with open(config_path) as f:

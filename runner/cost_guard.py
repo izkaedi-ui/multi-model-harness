@@ -26,7 +26,7 @@ class CostGuard:
     _global_spend: float = field(default=0.0)
 
     @classmethod
-    def from_config(cls, config: dict) -> "CostGuard":
+    def from_config(cls, config: dict) -> CostGuard:
         global_cfg = config.get("global", {})
         provider_cfg = config.get("providers", {})
 

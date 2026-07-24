@@ -4,7 +4,8 @@ Unit tests for Stage 3A Evaluator Contracts & JudgeEnsemble.
 from __future__ import annotations
 
 import unittest
-from evaluators.contracts import EvaluatorResult, EnsembleVerdict
+
+from evaluators.contracts import EvaluatorResult
 from evaluators.ensemble import JudgeEnsemble
 from security_harness.errors import ConfigurationError
 

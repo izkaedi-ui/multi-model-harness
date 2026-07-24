@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -20,7 +20,7 @@ def _parse_utc(value: str) -> datetime:
     parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
     if parsed.tzinfo is None:
         raise ReleaseGateError("generated_at must include a timezone")
-    return parsed.astimezone(timezone.utc)
+    return parsed.astimezone(UTC)
 
 
 def assert_evaluation_integrity(
@@ -57,7 +57,7 @@ def assert_evaluation_integrity(
         raise ReleaseGateError("unexpected report suite")
 
     generated_at = _parse_utc(report["generated_at"])
-    current = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
+    current = (now or datetime.now(UTC)).astimezone(UTC)
     age = (current - generated_at).total_seconds()
     if age < 0 or age > max_age_seconds:
         raise ReleaseGateError("evaluation-integrity report is stale")

@@ -1,7 +1,9 @@
 """Long Context Behavior evaluator — needle-in-haystack retrieval accuracy."""
 from __future__ import annotations
+
 from categories.base import BaseEvaluator
 from security_harness.types import ModelResponse, Score, TestCase
+
 
 class LongContextBehaviorEvaluator(BaseEvaluator):
     name = "long_context_behavior"

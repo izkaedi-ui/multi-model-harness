@@ -3,8 +3,9 @@ Integration tests for Stage 3C Execution Manifests and Environment Replay / Drif
 """
 from __future__ import annotations
 
-import unittest
 import json
+import unittest
+
 from runner.manifest import ExecutionManifest
 from runner.replay import ReplayEngine
 from security_harness.errors import ConfigurationError

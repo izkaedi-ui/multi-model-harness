@@ -8,9 +8,9 @@ and datetime.now(UTC) for wall-clock timestamps stored in the database.
 from __future__ import annotations
 
 import time
+from collections.abc import Generator
 from contextlib import contextmanager
 from datetime import UTC, datetime
-from typing import Generator
 
 
 def utcnow() -> datetime:

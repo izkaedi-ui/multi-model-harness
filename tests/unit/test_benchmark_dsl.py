@@ -3,12 +3,11 @@ Unit tests for Versioned Benchmark DSL models, parser, schema validation, path s
 """
 from __future__ import annotations
 
-import unittest
-import tempfile
 import json
+import tempfile
+import unittest
 from pathlib import Path
 
-from benchmark_dsl.models import Scenario, Step, Assertion
 from benchmark_dsl.parser import DSLParser
 from benchmark_dsl.versioning import calculate_fingerprint
 from security_harness.errors import ConfigurationError

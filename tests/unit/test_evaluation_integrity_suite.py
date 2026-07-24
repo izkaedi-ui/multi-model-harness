@@ -3,16 +3,12 @@
 from __future__ import annotations
 
 import json
-import math
-from datetime import datetime, timezone
-from pathlib import Path
 
 import pytest
 
-from security.evaluation_integrity_gate import ReleaseGateError, assert_evaluation_integrity
 from evaluators.evaluation_integrity import (
-    EvaluationIntegrityError,
     EvaluationCase,
+    EvaluationIntegrityError,
     build_isolated_cases,
     parse_evaluator_result,
 )

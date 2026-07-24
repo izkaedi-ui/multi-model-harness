@@ -3,13 +3,13 @@ Parser and validator for Versioned Benchmark DSL scenarios.
 """
 from __future__ import annotations
 
-import os
 import json
-import yaml
 from pathlib import Path
-from typing import Dict, Any, Union
+from typing import Any
 
-from benchmark_dsl.models import Scenario, Step, Assertion
+import yaml
+
+from benchmark_dsl.models import Assertion, Scenario, Step
 from benchmark_dsl.versioning import calculate_fingerprint
 from security_harness.errors import ConfigurationError
 
@@ -20,7 +20,7 @@ class DSLParser:
     """Parser and validator for YAML and legacy JSONL scenario files."""
 
     @staticmethod
-    def parse_dict(data: Dict[str, Any]) -> Scenario:
+    def parse_dict(data: dict[str, Any]) -> Scenario:
         """Parse dictionary payload into a validated Scenario object."""
         if not isinstance(data, dict):
             raise ConfigurationError("Scenario payload must be a dictionary")
@@ -67,10 +67,10 @@ class DSLParser:
         )
 
     @classmethod
-    def parse_file(cls, file_path: Union[str, Path]) -> Scenario:
+    def parse_file(cls, file_path: str | Path) -> Scenario:
         """Parse scenario from a YAML or JSON file on disk safely."""
         path = Path(file_path).resolve()
-        
+
         # Security: Prevent path traversal outside allowed directories
         if ".." in str(file_path):
             raise ConfigurationError(f"Path traversal detected in file path: {file_path}")

@@ -4,8 +4,8 @@ Judge Ensemble implementation supporting weighted voting, consensus, and determi
 from __future__ import annotations
 
 import logging
-from typing import List, Dict, Optional
-from evaluators.contracts import EvaluatorResult, EnsembleVerdict
+
+from evaluators.contracts import EnsembleVerdict, EvaluatorResult
 from security_harness.errors import ConfigurationError
 
 logger = logging.getLogger(__name__)
@@ -16,7 +16,7 @@ class JudgeEnsemble:
 
     def __init__(
         self,
-        weights: Optional[Dict[str, float]] = None,
+        weights: dict[str, float] | None = None,
         strategy: str = "weighted_majority",
         missing_judge_policy: str = "fail_closed",
     ) -> None:
@@ -27,7 +27,7 @@ class JudgeEnsemble:
         if strategy not in ("weighted_majority", "consensus", "unanimous"):
             raise ConfigurationError(f"Unsupported ensemble strategy: {strategy!r}")
 
-    def consolidate(self, results: List[EvaluatorResult]) -> EnsembleVerdict:
+    def consolidate(self, results: list[EvaluatorResult]) -> EnsembleVerdict:
         """Consolidate individual evaluator results into an EnsembleVerdict."""
         if not results:
             if self.missing_judge_policy == "fail_closed":
@@ -50,7 +50,7 @@ class JudgeEnsemble:
 
         total_weight = 0.0
         passed_weight = 0.0
-        scores: List[float] = []
+        scores: list[float] = []
 
         pass_count = sum(1 for r in results if r.passed)
         total_judges = len(results)

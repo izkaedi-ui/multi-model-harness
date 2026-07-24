@@ -19,16 +19,15 @@ __all__ = [
 ]
 
 from security_harness.types import (
-
+    ExecutionStatus,
+    ExpectedBehavior,
     ModelRequest,
     ModelResponse,
-    TokenUsage,
-    TestCase,
-    ExpectedBehavior,
+    RunStatus,
     Score,
+    TestCase,
+    TokenUsage,
     Verdict,
     VerdictStatus,
-    RunStatus,
-    ExecutionStatus,
 )
 

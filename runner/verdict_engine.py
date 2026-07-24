@@ -24,7 +24,7 @@ class VerdictEngine:
         self._min_confidence = min_confidence
 
     @classmethod
-    def from_config(cls, config_path: str = "config/scoring.yaml") -> "VerdictEngine":
+    def from_config(cls, config_path: str = "config/scoring.yaml") -> VerdictEngine:
         try:
             with open(config_path) as f:
                 cfg = yaml.safe_load(f) or {}

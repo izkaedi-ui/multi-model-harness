@@ -4,22 +4,20 @@ client cleanup, retry owner configuration, and provider identity preservation.
 """
 from __future__ import annotations
 
+import os
 import unittest
 from unittest.mock import AsyncMock, MagicMock, patch
-import os
+
 import openai
 
-from adapters.openai_adapter import OpenAIAdapter
 from adapters.anthropic_adapter import AnthropicAdapter
+from adapters.openai_adapter import OpenAIAdapter
 from adapters.xai_adapter import XAIAdapter
 from security_harness.errors import (
     AuthenticationError,
-    NonRetryableProviderError,
     RateLimitError,
-    RetryableProviderError,
 )
 from security_harness.types import ModelRequest
-
 
 ENV_MOCK = {
     "OPENAI_API_KEY": "sk-fake-openai-key",

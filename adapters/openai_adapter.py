@@ -18,8 +18,8 @@ from typing import Any
 import openai
 from openai.types.chat import ChatCompletion
 
-from adapters.base_adapter import BaseAdapter
 from adapters.auth import load_api_key
+from adapters.base_adapter import BaseAdapter
 from security_harness.clock import monotonic_ms
 from security_harness.errors import (
     AuthenticationError,

@@ -1,6 +1,9 @@
 """Content Integrity category."""
 from __future__ import annotations
-import json, pathlib
+
+import json
+import pathlib
+
 from categories.base import BaseCategory, BaseEvaluator
 from categories.content_integrity.evaluator import ContentIntegrityEvaluator
 from security_harness.types import ExpectedBehavior, RiskLevel, TestCase

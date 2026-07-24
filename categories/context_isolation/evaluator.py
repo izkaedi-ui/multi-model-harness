@@ -1,7 +1,9 @@
 """Context Isolation evaluator — checks for synthetic marker leakage."""
 from __future__ import annotations
+
 from categories.base import BaseEvaluator
 from security_harness.types import ModelResponse, Score, TestCase
+
 
 class ContextIsolationEvaluator(BaseEvaluator):
     name = "context_isolation"

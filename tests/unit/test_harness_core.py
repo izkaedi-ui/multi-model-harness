@@ -2,10 +2,12 @@
 Unit tests for the security test harness.
 """
 import unittest
+
 from adapters.cost_estimator import estimate_cost_usd
 from runner.cost_guard import CostGuard
 from security.secret_redactor import SecretRedactor
 from security_harness.errors import BudgetExceeded
+
 
 class TestHarnessCore(unittest.TestCase):
     def test_estimate_cost_usd_positive(self):

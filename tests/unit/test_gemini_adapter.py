@@ -3,14 +3,14 @@ Unit and mock integration tests for GeminiAdapter and Google/Gemini alias normal
 """
 from __future__ import annotations
 
+import os
 import unittest
 from unittest.mock import AsyncMock, MagicMock, patch
-import os
 
-from adapters.auth import has_api_key, load_api_key, available_providers
+from adapters.auth import available_providers, has_api_key, load_api_key
 from adapters.gemini_adapter import GeminiAdapter
-from security_harness.errors import MissingApiKeyError, NonRetryableProviderError
-from security_harness.types import ModelRequest, TokenUsage
+from security_harness.errors import MissingApiKeyError
+from security_harness.types import ModelRequest
 
 
 class TestGeminiAuth(unittest.TestCase):

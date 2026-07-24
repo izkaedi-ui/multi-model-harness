@@ -8,8 +8,8 @@ foreign keys enabled, and row factory set to aiosqlite.Row.
 from __future__ import annotations
 
 import pathlib
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
 
 import aiosqlite
 

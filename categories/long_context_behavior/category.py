@@ -1,6 +1,9 @@
 """Long Context Behavior category."""
 from __future__ import annotations
-import json, pathlib
+
+import json
+import pathlib
+
 from categories.base import BaseCategory, BaseEvaluator
 from categories.long_context_behavior.evaluator import LongContextBehaviorEvaluator
 from security_harness.types import ExpectedBehavior, RiskLevel, TestCase

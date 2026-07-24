@@ -4,7 +4,7 @@ Evaluator Protocol Contracts for Stage 3A.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Dict, Any, List, Optional, Protocol, runtime_checkable
+from typing import Any, Protocol, runtime_checkable
 
 
 @dataclass(frozen=True)
@@ -14,7 +14,7 @@ class EvaluatorResult:
     passed: bool
     score: float  # Normalized 0.0 - 1.0
     reason: str = ""
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -25,18 +25,18 @@ class EnsembleVerdict:
     strategy: str
     agreement_ratio: float
     disagreement_reported: bool
-    judge_results: List[EvaluatorResult]
+    judge_results: list[EvaluatorResult]
     tie_broken: bool = False
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @runtime_checkable
 class EvaluatorProtocol(Protocol):
     """Protocol that all judge evaluators must implement."""
-    
+
     @property
     def judge_id(self) -> str:
         ...
 
-    def evaluate(self, input_prompt: str, response_text: str, expected: Optional[Any] = None) -> EvaluatorResult:
+    def evaluate(self, input_prompt: str, response_text: str, expected: Any | None = None) -> EvaluatorResult:
         ...

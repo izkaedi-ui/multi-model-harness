@@ -4,7 +4,8 @@ Unit tests for Stage 3B Statistical Engine & Bootstrap Analysis.
 from __future__ import annotations
 
 import unittest
-from analytics.statistics import StatisticalEngine, ConfidenceInterval
+
+from analytics.statistics import StatisticalEngine
 from security_harness.errors import ConfigurationError
 
 
@@ -24,7 +25,7 @@ class TestStatisticalEngine(unittest.TestCase):
         vals = [0.8, 0.85, 0.9, 0.95, 0.7, 0.75, 0.88, 0.92, 0.81, 0.89]
         ci1 = StatisticalEngine.bootstrap_ci(vals, confidence=0.95, iterations=500, seed=123)
         ci2 = StatisticalEngine.bootstrap_ci(vals, confidence=0.95, iterations=500, seed=123)
-        
+
         self.assertEqual(ci1.mean, ci2.mean)
         self.assertEqual(ci1.ci_lower, ci2.ci_lower)
         self.assertEqual(ci1.ci_upper, ci2.ci_upper)

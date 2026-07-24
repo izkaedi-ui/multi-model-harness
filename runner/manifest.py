@@ -3,14 +3,13 @@ Execution Manifest Generator for Stage 3C Scientific Reproducibility.
 """
 from __future__ import annotations
 
-import os
-import sys
-import json
 import hashlib
+import json
 import platform
 import subprocess
-from dataclasses import dataclass, asdict, field
-from typing import List, Dict, Any
+import sys
+from dataclasses import asdict, dataclass, field
+from typing import Any
 
 
 @dataclass(frozen=True)
@@ -25,9 +24,9 @@ class ExecutionManifest:
     benchmark_id: str = ""
     benchmark_version: str = ""
     benchmark_fingerprint: str = ""
-    providers: List[str] = field(default_factory=list)
-    models: List[str] = field(default_factory=list)
-    parameters: Dict[str, Any] = field(default_factory=dict)
+    providers: list[str] = field(default_factory=list)
+    models: list[str] = field(default_factory=list)
+    parameters: dict[str, Any] = field(default_factory=dict)
     seed: int = 42
 
     def to_json(self) -> str:
@@ -40,9 +39,9 @@ class ExecutionManifest:
         benchmark_id: str,
         benchmark_version: str,
         benchmark_fingerprint: str,
-        providers: List[str],
-        models: List[str],
-        parameters: Dict[str, Any] | None = None,
+        providers: list[str],
+        models: list[str],
+        parameters: dict[str, Any] | None = None,
         seed: int = 42,
     ) -> ExecutionManifest:
         """Construct an ExecutionManifest capturing active environment state."""
@@ -54,7 +53,7 @@ class ExecutionManifest:
 
         python_ver = sys.version.split()[0]
         plat_info = f"{platform.system()}-{platform.release()}"
-        
+
         config_bytes = json.dumps(parameters or {}, sort_keys=True).encode("utf-8")
         config_hash = hashlib.sha256(config_bytes).hexdigest()
 

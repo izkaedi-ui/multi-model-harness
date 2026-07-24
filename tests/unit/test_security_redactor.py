@@ -5,7 +5,6 @@ are scrubbed from logs, dicts, JSON strings, and exported files.
 from __future__ import annotations
 
 import unittest
-import os
 
 from security.secret_redactor import SecretRedactor
 

@@ -36,7 +36,7 @@ from adapters.provider_factory import build_all_adapters
 from adapters.rate_limiter import RateLimiter
 from categories.registry import CategoryRegistry
 from runner.cost_guard import CostGuard
-from runner.execution_plan import ExecutionPlan, build_plan
+from runner.execution_plan import build_plan
 from runner.exporter import export_fixture
 from runner.metrics import RunMetrics
 from runner.response_store import ResponseStore
@@ -266,8 +266,8 @@ class Runner:
 
             # Persist to SQLite DB if database connection is available
             try:
-                from database.sqlite import get_connection, apply_schema
                 from database.repository import HarnessRepository
+                from database.sqlite import apply_schema, get_connection
                 await apply_schema()
                 async with get_connection() as conn:
                     repo = HarnessRepository(conn)

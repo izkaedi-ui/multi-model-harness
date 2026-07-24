@@ -138,7 +138,7 @@ class RateLimitError(RetryableProviderError):
             provider=provider,
             status_code=429,
             message=(
-                f"Rate limit exceeded"
+                "Rate limit exceeded"
                 + (f"; retry after {retry_after_seconds:.1f}s" if retry_after_seconds else "")
             ),
         )

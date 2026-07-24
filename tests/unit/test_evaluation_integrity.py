@@ -3,16 +3,16 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 
-from security.evaluation_integrity_gate import ReleaseGateError, assert_evaluation_integrity
 from evaluators.evaluation_integrity import (
     EvaluationIntegrityError,
     build_isolated_cases,
     parse_evaluator_result,
 )
+from security.evaluation_integrity_gate import ReleaseGateError, assert_evaluation_integrity
 
 
 def valid_payload(score: float = 0.9) -> str:
@@ -93,7 +93,7 @@ def _report(generated_at: str) -> dict:
 
 
 def test_release_gate_accepts_fresh_complete_report(tmp_path) -> None:
-    now = datetime(2026, 7, 24, 11, 0, tzinfo=timezone.utc)
+    now = datetime(2026, 7, 24, 11, 0, tzinfo=UTC)
     path = tmp_path / "judge_resistance.json"
     path.write_text(json.dumps(_report("2026-07-24T10:59:00Z")), encoding="utf-8")
 
@@ -103,7 +103,7 @@ def test_release_gate_accepts_fresh_complete_report(tmp_path) -> None:
 
 @pytest.mark.parametrize("mutation", ["missing", "malformed", "stale", "below_threshold", "failed_case"])
 def test_release_gate_fails_closed(tmp_path, mutation: str) -> None:
-    now = datetime(2026, 7, 24, 11, 0, tzinfo=timezone.utc)
+    now = datetime(2026, 7, 24, 11, 0, tzinfo=UTC)
     path = tmp_path / "judge_resistance.json"
 
     if mutation == "missing":

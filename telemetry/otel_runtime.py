@@ -6,8 +6,6 @@ import logging
 from typing import Any
 
 from telemetry.config import TelemetryConfig
-from telemetry.metrics import MetricsRuntime
-from telemetry.tracing import TracingRuntime, NullSpan
 
 log = logging.getLogger(__name__)
 
@@ -24,14 +22,14 @@ class OTelRuntime:
             return
 
         try:
-            from opentelemetry import trace, metrics
-            from opentelemetry.sdk.trace import TracerProvider
-            from opentelemetry.sdk.metrics import MeterProvider
-            from opentelemetry.sdk.resources import Resource
-            from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+            from opentelemetry import metrics, trace
             from opentelemetry.exporter.otlp.proto.grpc.metric_exporter import OTLPMetricExporter
-            from opentelemetry.sdk.trace.export import BatchSpanProcessor
+            from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+            from opentelemetry.sdk.metrics import MeterProvider
             from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader
+            from opentelemetry.sdk.resources import Resource
+            from opentelemetry.sdk.trace import TracerProvider
+            from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
             resource = Resource.create({
                 "service.name": self.config.service_name,

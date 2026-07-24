@@ -1,11 +1,10 @@
 """
 Unit and state transition tests for execution sequences and recovery paths.
 """
-import asyncio
 import unittest
 
 from adapters.base_adapter import BaseAdapter
-from security_harness.errors import NonRetryableProviderError, RetryableProviderError
+from security_harness.errors import NonRetryableProviderError
 from security_harness.types import ModelRequest, ModelResponse, TokenUsage
 
 

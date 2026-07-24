@@ -3,9 +3,11 @@ Artifact scanner — scans generated files for accidental secret leakage
 before they are exported or shared.
 """
 from __future__ import annotations
+
 import pathlib
-from security_harness.errors import SecretLeakDetected
+
 from security.secret_redactor import SecretRedactor
+from security_harness.errors import SecretLeakDetected
 
 
 class ArtifactScanner:
@@ -15,7 +17,7 @@ class ArtifactScanner:
         self.redactor = redactor or SecretRedactor.default()
 
     @classmethod
-    def default(cls) -> "ArtifactScanner":
+    def default(cls) -> ArtifactScanner:
         return cls(SecretRedactor.default())
 
     def scan_text(self, text: str, extension: str = ".txt") -> bool:

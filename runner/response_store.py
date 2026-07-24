@@ -1,6 +1,8 @@
 """Response store — in-memory write-through cache for responses during a run."""
 from __future__ import annotations
+
 from security_harness.types import ModelResponse
+
 
 class ResponseStore:
     def __init__(self) -> None:

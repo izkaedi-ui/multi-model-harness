@@ -1,8 +1,8 @@
 """Input validator — validates test case JSONL files against the canonical schema."""
 from __future__ import annotations
+
 import json
 from pathlib import Path
-from security_harness.errors import TestCaseError
 
 REQUIRED_FIELDS = {"id", "version", "category", "subcategory", "messages", "expected"}
 

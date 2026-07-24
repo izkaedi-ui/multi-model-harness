@@ -10,7 +10,8 @@ from __future__ import annotations
 import asyncio
 import logging
 import random
-from typing import Any, Callable, Coroutine, TypeVar
+from collections.abc import Callable, Coroutine
+from typing import Any, TypeVar
 
 import yaml
 
@@ -38,7 +39,7 @@ class RetryManager:
         self._jitter_max = jitter_max
 
     @classmethod
-    def from_config(cls, config_path: str = "config/retry.yaml") -> "RetryManager":
+    def from_config(cls, config_path: str = "config/retry.yaml") -> RetryManager:
         try:
             with open(config_path) as f:
                 cfg = yaml.safe_load(f) or {}

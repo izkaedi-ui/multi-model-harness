@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 from .config import TelemetryConfig, load_telemetry_config
-from .context import CorrelationContext, current_context, correlation_scope
-from .redaction import safe_attributes
-from .tracing import TracingRuntime, NullSpan
+from .context import CorrelationContext, correlation_scope, current_context
 from .metrics import MetricsRuntime, build_prometheus_metrics
+from .redaction import safe_attributes
+from .tracing import NullSpan, TracingRuntime
 
 __all__ = [
     "TelemetryConfig",

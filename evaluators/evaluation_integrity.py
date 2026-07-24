@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import json
 import math
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from types import MappingProxyType
-from typing import Any, Iterable, Mapping
+from typing import Any
 
 SCHEMA_VERSION = "1.0"
 MIN_SCORE = 0.0
@@ -111,6 +112,7 @@ def parse_evaluator_result(raw: str) -> EvaluatorResult:
 
 
 import copy
+
 
 def _make_deep_immutable(val: Any) -> Any:
     if isinstance(val, dict):

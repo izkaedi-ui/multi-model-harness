@@ -1,7 +1,9 @@
 """Run metrics — latency, throughput, error rates, token and cost tracking."""
 from __future__ import annotations
+
 import time
 from dataclasses import dataclass, field
+
 
 @dataclass
 class RunMetrics:

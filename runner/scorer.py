@@ -1,6 +1,8 @@
 """Scorer — dispatches responses to the correct per-category evaluator."""
 from __future__ import annotations
+
 import logging
+
 from categories.registry import CategoryRegistry
 from security_harness.types import ModelResponse, Score, TestCase
 

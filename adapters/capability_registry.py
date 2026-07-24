@@ -38,7 +38,7 @@ class CapabilityRegistry:
         self._capabilities = capabilities
 
     @classmethod
-    def from_config(cls, config_path: str = "config/models.yaml") -> "CapabilityRegistry":
+    def from_config(cls, config_path: str = "config/models.yaml") -> CapabilityRegistry:
         try:
             with open(config_path) as f:
                 raw = yaml.safe_load(f) or {}

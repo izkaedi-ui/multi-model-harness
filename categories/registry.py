@@ -36,7 +36,7 @@ class CategoryRegistry:
         self._categories = categories
 
     @classmethod
-    def default(cls) -> "CategoryRegistry":
+    def default(cls) -> CategoryRegistry:
         """Load all built-in categories."""
         categories: dict[str, BaseCategory] = {}
         for name, dotted_path in _CATEGORY_MODULE_PATHS.items():

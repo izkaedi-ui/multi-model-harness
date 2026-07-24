@@ -4,12 +4,12 @@ Unit tests for PluginRegistry and dynamic ProviderPlugin Protocol contracts.
 from __future__ import annotations
 
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
-from src.security_harness.plugins.contracts import PluginMetadata, ProviderPluginProtocol
-from src.security_harness.plugins.registry import PluginRegistry
 from adapters.provider_factory import build_adapter
 from security_harness.errors import ConfigurationError
+from src.security_harness.plugins.contracts import PluginMetadata, ProviderPluginProtocol
+from src.security_harness.plugins.registry import PluginRegistry
 
 
 class MockCustomPlugin:

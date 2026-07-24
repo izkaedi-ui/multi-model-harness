@@ -10,7 +10,9 @@ sys.path.insert(0, str(root / "src"))
 sys.path.insert(0, str(root))
 
 import asyncio
-from database.sqlite import apply_schema, apply_migrations
+
+from database.sqlite import apply_migrations, apply_schema
+
 
 async def main():
     print("Initializing SQLite database...")

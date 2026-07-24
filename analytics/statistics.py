@@ -7,7 +7,7 @@ import math
 import random
 import statistics
 from dataclasses import dataclass
-from typing import List, Dict, Any, Tuple
+
 from security_harness.errors import ConfigurationError
 
 
@@ -26,11 +26,11 @@ class StatisticalEngine:
     """Calculates statistical summary metrics and reproducible bootstrap confidence intervals."""
 
     @staticmethod
-    def calculate_summary(values: List[float]) -> Dict[str, float]:
+    def calculate_summary(values: list[float]) -> dict[str, float]:
         """Compute basic summary statistics."""
         if not values:
             raise ConfigurationError("Cannot compute statistics on empty input")
-        
+
         n = len(values)
         mean_val = statistics.mean(values)
         median_val = statistics.median(values)
@@ -48,7 +48,7 @@ class StatisticalEngine:
     @classmethod
     def bootstrap_ci(
         cls,
-        values: List[float],
+        values: list[float],
         confidence: float = 0.95,
         iterations: int = 1000,
         seed: int = 42,
@@ -56,7 +56,7 @@ class StatisticalEngine:
         """Compute reproducible bootstrap confidence intervals."""
         if not values:
             raise ConfigurationError("Cannot compute bootstrap CI on empty input")
-        
+
         n = len(values)
         warning = ""
         if n < 10:
@@ -75,7 +75,7 @@ class StatisticalEngine:
             )
 
         rng = random.Random(seed)
-        means: List[float] = []
+        means: list[float] = []
 
         for _ in range(iterations):
             resample = [rng.choice(values) for _ in range(n)]
@@ -101,18 +101,18 @@ class StatisticalEngine:
     @classmethod
     def pairwise_delta_ci(
         cls,
-        sample_a: List[float],
-        sample_b: List[float],
+        sample_a: list[float],
+        sample_b: list[float],
         confidence: float = 0.95,
         iterations: int = 1000,
         seed: int = 42,
-    ) -> Tuple[float, float, float]:
+    ) -> tuple[float, float, float]:
         """Compute bootstrap CI for difference in means (mean_a - mean_b)."""
         if not sample_a or not sample_b:
             raise ConfigurationError("Samples for pairwise comparison cannot be empty")
 
         rng = random.Random(seed)
-        deltas: List[float] = []
+        deltas: list[float] = []
         n_a, n_b = len(sample_a), len(sample_b)
 
         for _ in range(iterations):

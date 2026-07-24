@@ -1,7 +1,9 @@
 import asyncio
 import os
 import traceback
+
 import openai
+
 
 async def main():
     print("openai version:", openai.__version__)

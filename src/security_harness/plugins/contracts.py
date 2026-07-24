@@ -3,8 +3,8 @@ Plugin protocol contracts and interfaces for dynamic multi-model harness extensi
 """
 from __future__ import annotations
 
-from typing import Protocol, runtime_checkable, Any, Dict
 from dataclasses import dataclass, field
+from typing import Any, Protocol, runtime_checkable
 
 
 @dataclass(frozen=True)
@@ -20,10 +20,10 @@ class PluginMetadata:
 @runtime_checkable
 class ProviderPluginProtocol(Protocol):
     """Protocol contract that all dynamic provider plugins must satisfy."""
-    
+
     @property
     def metadata(self) -> PluginMetadata:
         ...
 
-    def create_adapter(self, config: Dict[str, Any]) -> Any:
+    def create_adapter(self, config: dict[str, Any]) -> Any:
         ...

@@ -18,8 +18,8 @@ from typing import Any
 import anthropic
 from anthropic.types import Message, TextBlock, ToolUseBlock
 
-from adapters.base_adapter import BaseAdapter
 from adapters.auth import load_api_key
+from adapters.base_adapter import BaseAdapter
 from security_harness.clock import monotonic_ms
 from security_harness.errors import (
     AuthenticationError,

@@ -11,6 +11,7 @@ Rules enforced here:
 from __future__ import annotations
 
 import os
+
 from dotenv import load_dotenv
 
 from security_harness.errors import MissingApiKeyError

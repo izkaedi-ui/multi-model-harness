@@ -3,17 +3,17 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+
 import pytest
 
-from security.evaluation_integrity_gate import ReleaseGateError, assert_evaluation_integrity
 from evaluators.evaluation_integrity import (
-    EvaluationIntegrityError,
     EvaluationCase,
+    EvaluationIntegrityError,
     build_isolated_cases,
     parse_evaluator_result,
 )
-
+from security.evaluation_integrity_gate import ReleaseGateError, assert_evaluation_integrity
 
 # --- Group I: Deep Immutability & State Contamination (Tests 61-70) ---
 
@@ -377,7 +377,7 @@ def test_117_duplicate_case_identifiers(tmp_path) -> None:
         "cases": [{"case_id": "A", "passed": True}, {"case_id": "A", "passed": True}]
     }))
     with pytest.raises(ReleaseGateError):
-        assert_evaluation_integrity(p, now=datetime(2026, 7, 24, 11, 30, tzinfo=timezone.utc))
+        assert_evaluation_integrity(p, now=datetime(2026, 7, 24, 11, 30, tzinfo=UTC))
 
 
 def test_118_case_evidence_omitted_while_counts_remain_unchanged(tmp_path) -> None:

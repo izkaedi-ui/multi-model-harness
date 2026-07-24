@@ -1,6 +1,9 @@
 """Context Isolation category."""
 from __future__ import annotations
-import json, pathlib
+
+import json
+import pathlib
+
 from categories.base import BaseCategory, BaseEvaluator
 from categories.context_isolation.evaluator import ContextIsolationEvaluator
 from security_harness.types import ExpectedBehavior, RiskLevel, TestCase

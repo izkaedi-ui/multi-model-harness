@@ -40,7 +40,7 @@ class SecretRedactor:
         self._sensitive_fields = sensitive_field_names
 
     @classmethod
-    def default(cls, config_path: str = "config/redaction.yaml") -> "SecretRedactor":
+    def default(cls, config_path: str = "config/redaction.yaml") -> SecretRedactor:
         """Load patterns from redaction.yaml."""
         try:
             with open(config_path) as f:

@@ -23,7 +23,9 @@ def _get_redactor() -> Any:
     global _redactor
     if _redactor is None:
         try:
-            from security_harness.security.secret_redactor import SecretRedactor  # type: ignore[import]
+            from security_harness.security.secret_redactor import (
+                SecretRedactor,  # type: ignore[import]
+            )
             _redactor = SecretRedactor.default()
         except Exception:
             # Redactor not yet available (e.g. during bootstrap) — use no-op

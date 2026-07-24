@@ -1,6 +1,6 @@
 # tests/unit/test_telemetry_tracing.py
 
-from telemetry.tracing import TracingRuntime, NullSpan
+from telemetry.tracing import NullSpan, TracingRuntime
 
 
 def test_telemetry_failure_does_not_break_execution() -> None:
