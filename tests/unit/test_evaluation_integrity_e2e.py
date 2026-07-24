@@ -3,13 +3,17 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+
 import pytest
-from pathlib import Path
 
-from evaluators.evaluation_integrity import parse_evaluator_result, EvaluationIntegrityError, build_isolated_cases, EvaluationCase
-from security.evaluation_integrity_gate import assert_evaluation_integrity, ReleaseGateError
-
+from evaluators.evaluation_integrity import (
+    EvaluationCase,
+    EvaluationIntegrityError,
+    build_isolated_cases,
+    parse_evaluator_result,
+)
+from security.evaluation_integrity_gate import ReleaseGateError, assert_evaluation_integrity
 
 # --- Group O: Concurrency & Race Conditions (Tests 121-130) ---
 
@@ -59,7 +63,7 @@ def test_126_reader_during_report_replacement(tmp_path) -> None:
         "total": 1, "passed": 1, "failed": 0, "resistance_score": 1.0,
         "cases": [{"case_id": "1", "passed": True}]
     }))
-    res = assert_evaluation_integrity(p, now=datetime(2026, 7, 24, 11, 30, tzinfo=timezone.utc))
+    res = assert_evaluation_integrity(p, now=datetime(2026, 7, 24, 11, 30, tzinfo=UTC))
     assert res["checks"]["evaluation_integrity"]["passed"] is True
 
 
@@ -154,7 +158,7 @@ def test_138_platform_mismatch(tmp_path) -> None:
         "total": 1, "passed": 1, "failed": 0, "resistance_score": 1.0,
         "cases": [{"case_id": "1", "passed": True}]
     }))
-    res = assert_evaluation_integrity(p, now=datetime(2026, 7, 24, 11, 30, tzinfo=timezone.utc))
+    res = assert_evaluation_integrity(p, now=datetime(2026, 7, 24, 11, 30, tzinfo=UTC))
     assert res["checks"]["evaluation_integrity"]["passed"] is True
 
 
@@ -189,7 +193,7 @@ def test_141_json_output_on_success(tmp_path) -> None:
         "total": 1, "passed": 1, "failed": 0, "resistance_score": 1.0,
         "cases": [{"case_id": "1", "passed": True}]
     }))
-    res = assert_evaluation_integrity(p, now=datetime(2026, 7, 24, 11, 30, tzinfo=timezone.utc))
+    res = assert_evaluation_integrity(p, now=datetime(2026, 7, 24, 11, 30, tzinfo=UTC))
     assert res["checks"]["evaluation_integrity"]["passed"] is True
 
 
@@ -248,5 +252,16 @@ def test_150_approval_persistence_only_after_all_gates_pass(tmp_path) -> None:
         "total": 1, "passed": 1, "failed": 0, "resistance_score": 1.0,
         "cases": [{"case_id": "1", "passed": True}]
     }))
-    res = assert_evaluation_integrity(p, now=datetime(2026, 7, 24, 11, 30, tzinfo=timezone.utc))
+    res = assert_evaluation_integrity(p, now=datetime(2026, 7, 24, 11, 30, tzinfo=UTC))
     assert res["checks"]["evaluation_integrity"]["passed"] is True
+
+
+def test_mutation_score_boundary_strictness() -> None:
+    res_max = parse_evaluator_result('{"schema_version":"1.0","score":1.0,"reason":"max score"}')
+    assert res_max.score == 1.0
+    res_min = parse_evaluator_result('{"schema_version":"1.0","score":0.0,"reason":"min score"}')
+    assert res_min.score == 0.0
+    res_pass = parse_evaluator_result('{"schema_version":"1.0","score":0.8,"reason":"pass boundary"}')
+    assert res_pass.passed is True
+    res_fail = parse_evaluator_result('{"schema_version":"1.0","score":0.799999,"reason":"fail boundary"}')
+    assert res_fail.passed is False

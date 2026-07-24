@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import Mapping
 
 
 @dataclass(frozen=True, slots=True)
@@ -50,7 +50,7 @@ def load_telemetry_config(
         metrics_enabled=metrics_enabled,
         traces_enabled=bool(vals.get("traces_enabled", False)),
         export_interval_seconds=float(
-            vals.get("export_interval_seconds", 15.0)
+            str(vals.get("export_interval_seconds", 15.0))
         ),
     )
 

@@ -9,6 +9,7 @@ import json
 import logging
 import pathlib
 import sys
+from typing import Any
 
 import click
 
@@ -113,9 +114,9 @@ def estimate_cost(provider: str, cases: int) -> None:
 @cli.command()
 def doctor() -> None:
     """Check provider environment health, credentials, database, and configuration."""
-    from adapters.auth import available_providers, has_api_key
-    from database.sqlite import get_connection, apply_schema
     import sqlite3
+
+    from adapters.auth import has_api_key
 
     click.echo("--- Multi-Provider Harness Doctor ---")
     click.echo("[OK] Python Environment & CLI Core initialized")
@@ -126,7 +127,10 @@ def doctor() -> None:
     present_count = 0
     for prov, key_var in [("openai", "OPENAI_API_KEY"), ("anthropic", "ANTHROPIC_API_KEY"),
                            ("google", ["GOOGLE_API_KEY", "GEMINI_API_KEY"]), ("xai", "XAI_API_KEY")]:
-        is_set = has_api_key(key_var)
+        if isinstance(key_var, list):
+            is_set = any(has_api_key(str(k)) for k in key_var)
+        else:
+            is_set = has_api_key(str(key_var))
         if is_set:
             present_count += 1
             status = "[OK] Key Present"
@@ -176,6 +180,7 @@ def doctor() -> None:
 def serve_metrics(host: str, port: int) -> None:
     """Start a persistent Prometheus metrics HTTP server daemon."""
     import time
+
     from telemetry.metrics import build_prometheus_metrics
     from telemetry.server import MetricsServer
 
@@ -200,9 +205,11 @@ def serve_metrics(host: str, port: int) -> None:
 def discover_models() -> None:
 
     """Discover available models from configured provider endpoints."""
-    from adapters.auth import has_api_key
     import os
+
     import openai
+
+    from adapters.auth import has_api_key
 
     click.echo("Discovering available models from active provider endpoints...")
     if has_api_key("OPENAI_API_KEY"):
@@ -289,9 +296,10 @@ def optimize() -> None:
 @click.option("--dry-run", is_flag=True, help="Preview backfill changes without modifying harness.db")
 def backfill_costs(dry_run: bool) -> None:
     """Recalculate and persist execution costs in harness.db using longest-prefix model pricing."""
-    from adapters.cost_estimator import estimate_cost_usd, _load_pricing
-    import adapters.cost_estimator
     import sqlite3
+
+    import adapters.cost_estimator
+    from adapters.cost_estimator import estimate_cost_usd
 
     adapters.cost_estimator._PRICING_CACHE = None  # Refresh pricing cache
     click.echo(f"--- Recalculating Historical Execution Costs (dry_run={dry_run}) ---")
@@ -361,11 +369,11 @@ def _run_quiet_command(args: list[str]) -> bool:
 
 def _collect_release_checks() -> dict[str, bool]:
     import compileall
-    import sqlite3
-    import sys
-    import pytest
-    import io
     import contextlib
+    import io
+    import sqlite3
+
+    import pytest
 
     # 1. Compilation
     comp_ok = bool(compileall.compile_dir(".", quiet=1))
@@ -382,7 +390,6 @@ def _collect_release_checks() -> dict[str, bool]:
     # 3. YAML Configuration & Benchmark DSL Validation
     try:
         from security.input_validator import validate_jsonl_file
-        from benchmark_dsl.parser import DSLParser
         categories_dir = pathlib.Path("categories")
         val_errors = []
         for jsonl_file in categories_dir.rglob("*.jsonl"):
@@ -405,10 +412,9 @@ def _collect_release_checks() -> dict[str, bool]:
 
     # 5. Telemetry & Observability Verification
     try:
-        from telemetry.config import TelemetryConfig
-        from telemetry.tracing import TracingRuntime, NullSpan
         from telemetry.metrics import MetricsRuntime
         from telemetry.redaction import safe_attributes
+        from telemetry.tracing import NullSpan, TracingRuntime
 
         telemetry_import = True
         telemetry_noop = isinstance(TracingRuntime(enabled=False).span("test").__enter__(), NullSpan)
@@ -453,7 +459,7 @@ from contextlib import contextmanager
 
 
 @contextmanager
-def _temporarily_suppress_logging():
+def _temporarily_suppress_logging() -> Any:
     root_logger = logging.getLogger()
     previous_level = root_logger.level
     root_logger.setLevel(logging.CRITICAL + 1)
