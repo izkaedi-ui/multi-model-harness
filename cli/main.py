@@ -111,13 +111,79 @@ def estimate_cost(provider: str, cases: int) -> None:
 
 
 @cli.command()
-def dashboard() -> None:
-    """Open the standalone HTML dashboard in the default browser."""
-    import webbrowser
-    path = pathlib.Path("dashboard/index.html").resolve()
-    click.echo(f"Opening dashboard at {path.as_uri()}")
-    webbrowser.open(path.as_uri())
+def doctor() -> None:
+    """Check provider environment health, credentials, database, and configuration."""
+    from adapters.auth import available_providers, has_api_key
+    from database.sqlite import get_connection, apply_schema
+    import sqlite3
+
+    click.echo("--- Multi-Provider Harness Doctor ---")
+    click.echo("[OK] Python Environment & CLI Core initialized")
+
+    # 1. API Keys
+    click.echo("\nChecking Provider Credentials:")
+    for prov, key_var in [("openai", "OPENAI_API_KEY"), ("anthropic", "ANTHROPIC_API_KEY"),
+                           ("google", ["GOOGLE_API_KEY", "GEMINI_API_KEY"]), ("xai", "XAI_API_KEY")]:
+        status = "[OK] Key Present" if has_api_key(key_var) else "[MISSING] Key Not Set"
+        click.echo(f"  - Provider {prov:<10}: {status}")
+
+    # 2. Database Health
+    click.echo("\nChecking Database Integrity:")
+    try:
+        conn = sqlite3.connect("harness.db")
+        integrity = conn.execute("PRAGMA integrity_check").fetchone()[0]
+        fk_check = conn.execute("PRAGMA foreign_key_check").fetchall()
+        conn.close()
+        if integrity == "ok" and not fk_check:
+            click.echo("  - harness.db       : [OK] Schema & Foreign Keys Valid")
+        else:
+            click.echo(f"  - harness.db       : [WARN] Integrity: {integrity}, FK errors: {len(fk_check)}")
+    except Exception as e:
+        click.echo(f"  - harness.db       : [ERROR] {e}")
+
+    # 3. Model Registry
+    click.echo("\nChecking Model Registry:")
+    try:
+        import yaml
+        with open("config/models.yaml") as f:
+            cfg = yaml.safe_load(f) or {}
+        providers_registered = list(cfg.keys())
+        click.echo(f"  - Registered Models: [OK] {sum(len(v) for v in cfg.values())} models across {providers_registered}")
+    except Exception as e:
+        click.echo(f"  - Model Registry   : [ERROR] {e}")
+
+    click.echo("\n[OK] Health Check Complete.")
+
+
+@cli.command()
+def discover_models() -> None:
+    """Discover available models from configured provider endpoints."""
+    from adapters.auth import has_api_key
+    import os
+    import openai
+
+    click.echo("Discovering available models from active provider endpoints...")
+    if has_api_key("OPENAI_API_KEY"):
+        click.echo("\n[OpenAI] Querying /v1/models...")
+        try:
+            client = openai.OpenAI(api_key=os.environ["OPENAI_API_KEY"], timeout=10.0)
+            models = sorted([m.id for m in client.models.list().data if "gpt" in m.id or "o1" in m.id or "o3" in m.id])
+            click.echo(f"  Active OpenAI Models ({len(models)}): {models[:5]}...")
+        except Exception as e:
+            click.echo(f"  [ERROR] {e}")
+
+    if has_api_key("XAI_API_KEY"):
+        click.echo("\n[xAI] Querying /v1/models...")
+        try:
+            client = openai.OpenAI(api_key=os.environ["XAI_API_KEY"], base_url="https://api.x.ai/v1", timeout=10.0)
+            models = sorted([m.id for m in client.models.list().data])
+            click.echo(f"  Active xAI Models ({len(models)}): {models}")
+        except Exception as e:
+            click.echo(f"  [ERROR] {e}")
+
+    click.echo("\n[OK] Discovery complete.")
 
 
 if __name__ == "__main__":
     cli()
+

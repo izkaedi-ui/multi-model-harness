@@ -97,5 +97,21 @@ def export_fixture(
     with output_path.open("w", encoding="utf-8") as f:
         json.dump(fixture, f, indent=2, default=str)
 
-    log.info("exporter.fixture_written", extra={"path": str(output_path)})
+    # Write reproducibility manifest alongside fixture
+    manifest_path = _ARTIFACTS_DIR / f"manifest_{run_id}.json"
+    import platform
+    manifest = {
+        "run_id": run_id,
+        "harness_version": "0.1.0",
+        "generated_at": datetime.now(UTC).isoformat(),
+        "python_version": platform.python_version(),
+        "platform": platform.platform(),
+        "total_executions": len(results),
+        "total_cost_usd": metrics.total_cost_usd,
+    }
+    with manifest_path.open("w", encoding="utf-8") as mf:
+        json.dump(manifest, mf, indent=2, default=str)
+
+    log.info("exporter.fixture_written", extra={"path": str(output_path), "manifest": str(manifest_path)})
     return str(output_path.resolve())
+
