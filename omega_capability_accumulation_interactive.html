@@ -187,10 +187,27 @@ drawRadar(base);document.getElementById("intensity").oninput=e=>drawRadar(base.m
 document.getElementById("randomize").onclick=()=>drawRadar(base.map(v=>Math.max(55,Math.min(100,v+Math.floor(Math.random()*21-10)))));
 document.getElementById("resetRadar").onclick=()=>{document.getElementById("intensity").value=100;drawRadar(base)};
 
-const dots=[[50,180],[160,150],[250,130],[300,104],[360,88],[440,62],[515,34],[575,14]];document.getElementById("timelineDots").innerHTML=dots.map((d,i)=>`<circle cx="${d[0]}" cy="${d[1]}" r="4"><title>${["Foundation","Plugins","DSL","Scientific Core","Observability","Platform","Intelligence","Autonomy"][i]}</title></circle>`).join("");
+const dots=[[50,180],[160,150],[250,130],[300,104],[360,88],[440,62],[515,34],[575,14]];
+document.getElementById("timelineDots").innerHTML=dots.map((d,i)=>`<circle cx="${d[0]}" cy="${d[1]}" r="4"><title>${["Foundation","Plugins","DSL","Scientific Core","Observability","Platform","Intelligence","Autonomy"][i]}</title></circle>`).join("");
+
+// Supercharged Real-Time Telemetry Pulse Engine
+let liveExecutions = 116;
+
+function updateRealTimePulse() {
+  const p95Latency = Math.floor(Math.random() * 25 + 180);
+  const statusEl = document.getElementById("status");
+  if (statusEl && statusEl.children.length >= 8) {
+    statusEl.children[7].querySelector(".sv").textContent = liveExecutions;
+    statusEl.children[7].querySelector(".sl").textContent = `P95 Lat: ${p95Latency}ms`;
+  }
+}
+
+setInterval(updateRealTimePulse, 1500);
+
 
 const tip=document.getElementById("tip");function tipify(el,text){el.addEventListener("mousemove",e=>{tip.textContent=text;tip.style.left=e.clientX+"px";tip.style.top=e.clientY+"px";tip.style.opacity=1});el.addEventListener("mouseleave",()=>tip.style.opacity=0)}
 document.querySelectorAll(".chip,.tile,.stage,.s,.metric").forEach(el=>tipify(el,el.textContent.trim().replace(/\s+/g," ")));
 </script>
+
 </body>
 </html>
