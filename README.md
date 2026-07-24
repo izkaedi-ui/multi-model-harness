@@ -8,29 +8,51 @@
 
 Build a trustworthy AI evaluation platform whose conclusions are supported by evidence rather than assumptions. Every core property of the platform must be expressed as an **engineering guarantee** and verified through automated tests, reproducible evidence artifacts, and machine release gates.
 
-### 📐 Foundational Engineering Principles
+---
+
+## 🏛️ The 7-Level Architecture Hierarchy & Proof Pipeline
+
+```text
+Mission  ──▶  Principles  ──▶  Engineering Guarantees  ──▶  Verification  ──▶  Evidence Artifact  ──▶  Release Gate  ──▶  Trust Claim
+```
+
+---
+
+## 📐 Foundational Engineering Principles
 
 1. 📊 **Measure before concluding**: Every score is grounded in raw data, confidence intervals, and judge agreement.
 2. 🔄 **Reproduce before comparing**: No evaluation is valid without a matching signed replay manifest and environment fingerprint.
 3. 📉 **Detect change before reacting**: Statistically significant model drift must be detected and documented over time.
 4. 🔌 **Verify extensions before trusting them**: Dynamic plugins must pass metadata verification and credential boundary isolation.
 5. 🔒 **Observe systems without exposing sensitive data**: Telemetry scrubbers guarantee zero prompt or secret leakage across logs, traces, and metrics.
+6. 🎯 **Prefer evidence over inference**: Every architectural claim must be backed by automated tests, statistical CIs, replay manifests, or release gate verdicts.
 
 ---
 
-## 🏛️ The Five Guarantees Proof Pipeline
+## 🛡️ The Five Engineering Guarantees & Verifiable Trust Claims
+
+| Guarantee | Verification Question | Required Evidence Artifact | Verified Trust Claim |
+| :--- | :--- | :--- | :--- |
+| ⚖️ **Evaluation Integrity** | *Can the evaluation be manipulated?* | Adversarial suite & judge-resistance report | Benchmark results are resistant to prompt injection and evaluator manipulation. |
+| 🔄 **Reproducibility** | *Can this result be reproduced?* | Signed replay manifest & environment fingerprint | Results can be bit-for-bit replayed or environment drift is explicitly identified. |
+| 📉 **Drift Awareness** | *Did the model silently change?* | Drift analysis report with statistical CIs | Statistically significant behavior and cost changes are automatically detected. |
+| 🔌 **Trusted Extensibility** | *Can extensions be trusted?* | Plugin verification report & compatibility manifest | Dynamic plugins pass interface verification and credential boundary isolation. |
+| 🔒 **Confidential Observability** | *Did telemetry leak protected data?* | Secret-leak audit report (zero findings) | Telemetry pipelines scrub secrets and prompts before export. |
+
+---
+
+## ⚖️ Contributor Decision Rubric
+
+Before proposing or implementing any feature, pull request, or roadmap item, answer:
 
 ```text
-Engineering Guarantee  ──▶  Verification  ──▶  Evidence Artifact  ──▶  Release Gate
+[ ] Which engineering guarantee does this improve?
+[ ] What verification demonstrates it works?
+[ ] What evidence artifact proves the verification?
+[ ] How is it incorporated into the machine release gate?
 ```
 
-| Guarantee | Verification Question | Required Evidence Artifact | Status |
-| :--- | :--- | :--- | :--- |
-| ⚖️ **Evaluation Integrity** | *Can the evaluation be manipulated?* | Adversarial benchmark suite & judge-resistance report | `v0.6.0` (Active) |
-| 🔄 **Reproducibility** | *Can this result be reproduced?* | Signed replay manifest & environment fingerprint | `v0.6.1` (Active) |
-| 📉 **Drift Awareness** | *Did the model silently change?* | Drift analysis report with statistical confidence | `v0.8.0` (Target) |
-| 🔌 **Trusted Extensibility** | *Can extensions be trusted?* | Plugin verification report & compatibility manifest | `v0.9.0` (Target) |
-| 🔒 **Confidential Observability** | *Did telemetry leak protected data?* | Secret-leak audit report with zero findings | `v0.6.1` (Active) |
+*If these questions cannot be answered with empirical evidence, the proposal is deferred.*
 
 ---
 
