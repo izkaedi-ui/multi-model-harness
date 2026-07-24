@@ -22,16 +22,41 @@ class TestCLIMachineReadablePurity(unittest.TestCase):
     def setUp(self):
         self.runner = CliRunner()
 
-    def test_release_check_json_purity(self):
-        result = self.runner.invoke(cli, ["release-check", "--format", "json"])
-        # Find JSON payload in CLI output
-        raw_output = result.output.strip()
-        json_start = raw_output.find("{")
-        self.assertNotEqual(json_start, -1)
-        json_str = raw_output[json_start:]
-        data = json.loads(json_str)
-        self.assertIn("verdict", data)
-        self.assertIn("checks", data)
+    @patch(
+        "cli.main._collect_release_checks",
+        return_value={
+            "compilation": True,
+            "unit_tests": True,
+            "validation": True,
+            "database_integrity": True,
+            "git_clean": True,
+        },
+    )
+    def test_release_check_json_purity(self, _mock_checks):
+        result = self.runner.invoke(cli, ["release-check", "--format", "json", "--strict"])
+        self.assertEqual(result.exit_code, 0)
+        data = json.loads(result.output.strip())
+        self.assertEqual(data["verdict"], "ready")
+        self.assertTrue(data["strict_mode"])
+        self.assertTrue(all(data["checks"].values()))
+
+    @patch(
+        "cli.main._collect_release_checks",
+        return_value={
+            "compilation": True,
+            "unit_tests": True,
+            "validation": True,
+            "database_integrity": True,
+            "git_clean": False,
+        },
+    )
+    def test_release_check_json_strict_failure(self, _mock_checks):
+        result = self.runner.invoke(cli, ["release-check", "--format", "json", "--strict"])
+        self.assertEqual(result.exit_code, 1)
+        data = json.loads(result.output.strip())
+        self.assertEqual(data["verdict"], "failed")
+        self.assertFalse(data["checks"]["git_clean"])
+
 
 
 

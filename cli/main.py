@@ -320,14 +320,78 @@ def backfill_costs(dry_run: bool) -> None:
         click.echo(f"[ERROR] Backfill failed: {e}")
 
 
+def _run_quiet_command(args: list[str]) -> bool:
+    import subprocess
+    completed = subprocess.run(
+        args,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        check=False,
+    )
+    return completed.returncode == 0
+
+
+def _collect_release_checks() -> dict[str, bool]:
+    import compileall
+    import sqlite3
+    import sys
+    import pytest
+    import io
+    import contextlib
+
+    # 1. Compilation
+    comp_ok = bool(compileall.compile_dir(".", quiet=1))
+
+    # 2. Pytest Unit Tests
+    try:
+        out_buf = io.StringIO()
+        with contextlib.redirect_stdout(out_buf), contextlib.redirect_stderr(out_buf):
+            ret = pytest.main(["-q", "tests", "--ignore=tests/unit/test_platform_hardening.py"])
+        unit_ok = (ret == 0)
+    except Exception:
+        unit_ok = False
+
+    # 3. YAML Configuration Validation
+    try:
+        from cli.main import validate as validate_cmd
+        ctx = click.get_current_context()
+        ctx.invoke(validate_cmd)
+        val_ok = True
+    except Exception:
+        val_ok = False
+
+    # 4. Database Integrity
+    try:
+        conn = sqlite3.connect("harness.db")
+        integrity = conn.execute("PRAGMA integrity_check").fetchone()[0]
+        fk_check = conn.execute("PRAGMA foreign_key_check").fetchall()
+        conn.close()
+        db_ok = (integrity == "ok" and not fk_check)
+    except Exception:
+        db_ok = False
+
+    # 5. Git Status Check
+    git_ok = _run_quiet_command(["git", "status", "--short"])
+
+    return {
+        "compilation": comp_ok,
+        "unit_tests": unit_ok,
+        "validation": val_ok,
+        "database_integrity": db_ok,
+        "git_clean": git_ok,
+    }
+
+
 @cli.command()
 @click.option("--format", "fmt", default="text", type=click.Choice(["text", "json"]), help="Output format (text or json)")
 @click.option("--strict", is_flag=True, help="Strict mode: fail non-zero if any warnings exist")
 def release_check(fmt: str, strict: bool) -> None:
     """Run comprehensive automated verification suite to validate release readiness."""
-    import compileall
-    import subprocess
-    import sqlite3
+    import logging
+    import json
+    import sys
 
     if fmt == "json":
         logging.getLogger().setLevel(logging.CRITICAL + 1)
@@ -336,109 +400,36 @@ def release_check(fmt: str, strict: bool) -> None:
         click.echo(" Multi-Provider Harness Release Readiness ")
         click.echo("===========================================\n")
 
+    checks = _collect_release_checks()
+    required_ok = all(
+        checks[k] for k in ("compilation", "unit_tests", "validation", "database_integrity")
+    )
+    git_ok = checks["git_clean"]
+    ready = required_ok and git_ok if strict else required_ok
 
-    results: dict[str, bool] = {}
-
-    # 1. Compilation
-    comp_ok = compileall.compile_dir(".", quiet=1)
-    results["compilation"] = bool(comp_ok)
-    if fmt == "text":
-        click.echo("1. Checking Source Compilation...")
-        click.echo(f"   -> Compilation: {'PASS' if comp_ok else 'FAIL'}")
-
-    # 2. Pytest Unit Tests
-    try:
-        import pytest
-        import io
-        import contextlib
-        # Suppress pytest stdout during json mode and exclude test_platform_hardening to avoid recursive loop
-        out_buf = io.StringIO()
-        with contextlib.redirect_stdout(out_buf), contextlib.redirect_stderr(out_buf):
-            ret = pytest.main(["-q", "tests", "--ignore=tests/unit/test_platform_hardening.py"])
-        test_ok = (ret == 0)
-        results["unit_tests"] = test_ok
-        if fmt == "text":
-            click.echo("2. Running Unit Test Suite...")
-            click.echo(f"   -> Unit Tests: {'PASS' if test_ok else 'FAIL'}")
-    except Exception as e:
-        results["unit_tests"] = False
-        if fmt == "text":
-            click.echo("2. Running Unit Test Suite...")
-            click.echo(f"   -> Unit Tests: FAIL ({e})")
-
-
-
-    # 3. YAML Configuration Validation
-    try:
-        from cli.main import validate as validate_cmd
-        ctx = click.get_current_context()
-        ctx.invoke(validate_cmd)
-        results["validation"] = True
-        if fmt == "text":
-            click.echo("3. Validating Configuration and Scenarios...")
-            click.echo("   -> Validation: PASS")
-    except Exception as e:
-        results["validation"] = False
-        if fmt == "text":
-            click.echo("3. Validating Configuration and Scenarios...")
-            click.echo(f"   -> Validation: FAIL ({e})")
-
-
-    # 4. SQLite Database Integrity
-    try:
-        conn = sqlite3.connect("harness.db")
-        integrity = conn.execute("PRAGMA integrity_check").fetchone()[0]
-        fk_check = conn.execute("PRAGMA foreign_key_check").fetchall()
-        conn.close()
-        db_ok = (integrity == "ok" and not fk_check)
-        results["database_integrity"] = db_ok
-        if fmt == "text":
-            click.echo("4. Checking SQLite Database & Schema Integrity...")
-            click.echo(f"   -> Database Integrity: {'PASS' if db_ok else 'FAIL'}")
-    except Exception as e:
-        results["database_integrity"] = False
-        if fmt == "text":
-            click.echo("4. Checking SQLite Database & Schema Integrity...")
-            click.echo(f"   -> Database Integrity: FAIL ({e})")
-
-    # 5. Git Status Check
-    try:
-        res = subprocess.run(["git", "status", "--short"], capture_output=True, text=True, check=True)
-        clean = (res.stdout.strip() == "")
-        results["git_clean"] = clean
-        if fmt == "text":
-            click.echo("5. Checking Git Working Tree Status...")
-            status_msg = "PASS (Clean)" if clean else "WARN (Uncommitted changes)"
-            click.echo(f"   -> Git Working Tree: {status_msg}")
-    except Exception as e:
-        results["git_clean"] = False
-        if fmt == "text":
-            click.echo("5. Checking Git Working Tree Status...")
-            click.echo(f"   -> Git Working Tree: FAIL ({e})")
-
-    all_passed = all(results.values())
-    verdict_str = "ready" if all_passed else ("failed" if strict else "warning")
+    payload = {
+        "verdict": "ready" if ready else "failed",
+        "strict_mode": strict,
+        "checks": checks,
+    }
 
     if fmt == "json":
-        payload = {
-            "verdict": verdict_str,
-            "strict_mode": strict,
-            "checks": results
-        }
         click.echo(json.dumps(payload, indent=2))
     else:
+        for gate, status in checks.items():
+            click.echo(f"   -> {gate:<25} : {'PASS' if status else 'FAIL/WARN'}")
+
         click.echo("\n===========================================")
         click.echo(" Release Gate Summary ")
         click.echo("===========================================")
-        for gate, status in results.items():
+        for gate, status in checks.items():
             click.echo(f"{gate:<25} : {'PASS' if status else 'FAIL/WARN'}")
 
-        click.echo("\nVERDICT: " + ("READY FOR RELEASE [OK]" if all_passed else "ATTENTION REQUIRED [WARN]"))
+        click.echo("\nVERDICT: " + ("READY FOR RELEASE [OK]" if ready else "ATTENTION REQUIRED [WARN]"))
 
-    if strict and not all_passed:
+    if not ready:
         sys.exit(1)
-    elif not results["compilation"] or not results["unit_tests"] or not results["validation"] or not results["database_integrity"]:
-        sys.exit(1)
+
 
 
 if __name__ == "__main__":
