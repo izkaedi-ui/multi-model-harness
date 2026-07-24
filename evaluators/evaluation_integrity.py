@@ -110,6 +110,17 @@ def parse_evaluator_result(raw: str) -> EvaluatorResult:
     )
 
 
+import copy
+
+def _make_deep_immutable(val: Any) -> Any:
+    if isinstance(val, dict):
+        return MappingProxyType({k: _make_deep_immutable(v) for k, v in val.items()})
+    elif isinstance(val, list):
+        return tuple(_make_deep_immutable(v) for v in val)
+    elif isinstance(val, set):
+        return frozenset(_make_deep_immutable(v) for v in val)
+    return val
+
 @dataclass(frozen=True, slots=True)
 class EvaluationCase:
     case_id: str
@@ -124,8 +135,8 @@ class EvaluationCase:
         prompt: str,
         metadata: Mapping[str, Any] | None = None,
     ) -> EvaluationCase:
-        snapshot = dict(metadata or {})
-        return cls(case_id=case_id, prompt=prompt, metadata=MappingProxyType(snapshot))
+        snapshot = copy.deepcopy(dict(metadata or {}))
+        return cls(case_id=case_id, prompt=prompt, metadata=_make_deep_immutable(snapshot))
 
 
 def build_isolated_cases(cases: Iterable[Mapping[str, Any]]) -> tuple[EvaluationCase, ...]:
@@ -137,3 +148,4 @@ def build_isolated_cases(cases: Iterable[Mapping[str, Any]]) -> tuple[Evaluation
         )
         for case in cases
     )
+

@@ -74,10 +74,25 @@ def assert_evaluation_integrity(
         raise ReleaseGateError("report counts are inconsistent")
     if not isinstance(cases, list) or len(cases) != total:
         raise ReleaseGateError("report cases do not match total")
+
+    actual_passed = sum(1 for c in cases if isinstance(c, dict) and c.get("passed") is True)
+    actual_failed = total - actual_passed
+    if actual_passed != passed or actual_failed != failed:
+        raise ReleaseGateError("report case results do not match declared totals")
+
+    recomputed_score = actual_passed / float(total) if total > 0 else 0.0
+    if abs(recomputed_score - float(score)) > 1e-6:
+        raise ReleaseGateError("report resistance_score does not match recomputed score")
+
+    case_ids = [c.get("case_id") for c in cases if isinstance(c, dict)]
+    if len(set(case_ids)) != len(case_ids):
+        raise ReleaseGateError("duplicate case_id entries in report")
+
     if isinstance(score, bool) or not isinstance(score, (int, float)):
         raise ReleaseGateError("resistance_score must be numeric")
     if float(score) < min_resistance_score or failed != 0:
         raise ReleaseGateError("evaluation-integrity threshold not met")
+
 
     return {
         "checks": {
