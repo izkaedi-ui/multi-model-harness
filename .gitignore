@@ -53,3 +53,11 @@ desktop.ini
 
 # Checkpoints (contain partial run state — may have sensitive data)
 checkpoints/
+
+# SQLite scratch files
+.schema
+.tables
+SELECT
+
+# Local manifests (optional)
+harness-manifest.csv
