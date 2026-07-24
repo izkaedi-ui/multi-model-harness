@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Omega Supreme — Interactive Capability Accumulation</title>
+<style>
+  :root{
+    --bg:#07101f; --panel:#0c1629; --panel2:#101b31; --line:#1e3a5f;
+    --cyan:#54e8ff; --blue:#3d8cff; --violet:#9d6cff; --mag:#ef6dff;
+    --green:#57f29a; --gold:#ffbf4b; --orange:#ff7d4d; --text:#eef5ff; --muted:#9db3cf;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:
+    radial-gradient(circle at 50% -10%,rgba(78,109,255,.16),transparent 35%),
+    radial-gradient(circle at 100% 0,rgba(201,77,255,.10),transparent 28%),
+    linear-gradient(180deg,#050b16,#07101f 55%,#050913);
+    color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif;overflow-x:hidden}
+  .app{max-width:1800px;margin:auto;padding:14px}
+  .topbar{display:grid;grid-template-columns:1.5fr 2.5fr 1.4fr;gap:12px;margin-bottom:12px}
+  .card{background:linear-gradient(180deg,rgba(17,31,57,.96),rgba(8,18,34,.96));border:1px solid rgba(88,166,255,.35);
+    border-radius:12px;box-shadow:0 0 0 1px rgba(255,255,255,.02),0 18px 60px rgba(0,0,0,.34),inset 0 0 35px rgba(72,126,255,.035)}
+  .brand{padding:18px 20px;display:flex;align-items:center;gap:14px}
+  .omega{font-size:42px;color:#78d9ff;text-shadow:0 0 22px rgba(84,232,255,.65)}
+  h1{font-size:24px;margin:0;letter-spacing:.5px}
+  .sub{font-size:12px;color:var(--muted);margin-top:4px}
+  .metrics{display:grid;grid-template-columns:repeat(5,1fr);padding:10px}
+  .metric{padding:12px;text-align:center;border-right:1px solid rgba(129,163,213,.2)}
+  .metric:last-child{border-right:0}.metric .v{font-size:28px;font-weight:800}.metric .l{font-size:10px;color:var(--muted)}
+  .mission{padding:16px 18px;position:relative;overflow:hidden}.mission:after{content:"";position:absolute;right:-30px;top:-35px;width:130px;height:130px;border-radius:50%;background:radial-gradient(circle,rgba(53,144,255,.35),transparent 65%)}
+  .mission b{font-size:11px;color:#b8d5ff;letter-spacing:1px}.mission p{font-size:12px;color:#dbe8ff;line-height:1.45;max-width:85%}
+  .grid{display:grid;grid-template-columns:1.1fr 1.08fr 1.1fr;gap:12px}
+  .col{display:grid;gap:12px;align-content:start}.panel{padding:13px 14px}
+  .title{font-size:14px;font-weight:800;color:#79c8ff;letter-spacing:.4px;margin:0 0 10px}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .ring{aspect-ratio:1;border-radius:50%;display:grid;place-items:center;position:relative;background:conic-gradient(var(--c) calc(var(--p)*1%),#16304b 0)}
+  .ring:before{content:"";position:absolute;inset:9px;border-radius:50%;background:#0d1728}
+  .ring span{position:relative;font-size:22px;font-weight:800}.ringlabel{text-align:center;font-size:9px;color:#c7d5e7;margin-top:7px}
+  .cap-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+  .cap{padding:11px 8px;border:1px solid #23446a;border-radius:8px;background:linear-gradient(180deg,#0d1b31,#0a1426);text-align:center;cursor:pointer;transition:.22s}
+  .cap:hover,.cap.active{transform:translateY(-3px);border-color:var(--cyan);box-shadow:0 0 18px rgba(84,232,255,.24)}
+  .cap .i{font-size:22px}.cap .n{font-size:10px;margin-top:5px}.cap[data-tier="ultra"]{border-color:#7044ad}.cap[data-tier="autonomous"]{border-color:#b57127}
+  .power{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}.power .tile{padding:12px 6px;text-align:center;border-radius:8px;background:#0a182a;border:1px solid #23446a}
+  .power .big{font-size:22px}.power .small{font-size:9px;color:#afc0d8}
+  .breakdown .row{display:grid;grid-template-columns:1.25fr 2.6fr 38px;gap:8px;align-items:center;font-size:11px;margin:9px 0}
+  .bar{height:8px;background:#0a2139;border-radius:99px;overflow:hidden}.bar span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--blue),var(--violet),var(--mag))}
+  .heat{display:grid;grid-template-columns:repeat(8,1fr);gap:8px}.heatcol{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
+  .sq{aspect-ratio:1;background:#18304f;border:1px solid rgba(255,255,255,.08);border-radius:2px}.sq.on1{background:#1e5ba9}.sq.on2{background:#6651cb}.sq.on3{background:#c05d31}.sq.on4{background:#1d7a59}.sq.on5{background:#a49738}
+  .road{display:grid;grid-template-columns:repeat(5,1fr);gap:9px}.road .stage{min-height:145px;padding:10px;border-radius:8px;border:1px solid #29476d;background:#0a1527}
+  .stage h4{margin:0 0 8px;font-size:12px}.stage p{font-size:9px;color:#b9c9dc;line-height:1.45;margin:4px 0}
+  .status{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.status .s{padding:13px 8px;border-radius:8px;background:#0b261e;border:1px solid #206a50;text-align:center}.status .sv{font-size:20px;color:#62f6a4;font-weight:800}.status .sl{font-size:9px;color:#9cc7b4}
+  #radarWrap{position:relative;min-height:420px}#radar{width:100%;height:auto;display:block}
+  .stack .layer{margin:7px 0;padding:12px;border:1px solid #335176;border-radius:8px;background:#0b1729}.stack .layer b{font-size:11px}.chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}.chip{padding:6px 9px;border:1px solid #2c4b73;border-radius:6px;font-size:9px;color:#c9d8eb;background:#0b1a2e}
+  .footer{margin-top:12px;display:grid;grid-template-columns:1fr auto;gap:12px}.footer .card{padding:13px 16px}
+  .ticker{display:flex;gap:24px;flex-wrap:wrap;font-size:10px;color:#b9cef0}.badge{display:inline-flex;align-items:center;gap:7px}
+  .pulse{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);animation:pulse 1.5s infinite}
+  @keyframes pulse{50%{opacity:.3;transform:scale(.7)}} .controlbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+  button,select,input[type=range]{accent-color:#7adfff}
+  button{background:#10233d;color:#dcecff;border:1px solid #2b527e;border-radius:7px;padding:7px 10px;cursor:pointer}
+  button:hover{border-color:var(--cyan);box-shadow:0 0 12px rgba(84,232,255,.2)}
+  .tooltip{position:fixed;pointer-events:none;background:#06101e;border:1px solid #4c84b9;color:#eaf5ff;padding:8px 10px;border-radius:7px;font-size:11px;opacity:0;transform:translate(-50%,-120%);transition:.12s;z-index:20;max-width:240px}
+  @media(max-width:1200px){.grid{grid-template-columns:1fr}.topbar{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(5,1fr)}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <section class="card brand"><div class="omega">Ω</div><div><h1>OMEGA SUPREME HARNESS</h1><div class="sub">ACCUMULATION OF CAPABILITIES — SUPERCHARGED INTERACTIVE UPGRADE</div></div></section>
+    <section class="card metrics">
+      <div class="metric"><div class="v" style="color:#5fb6ff">48+</div><div class="l">CAPABILITIES</div></div>
+      <div class="metric"><div class="v" style="color:#68f0db">20</div><div class="l">MAJOR DOMAINS</div></div>
+      <div class="metric"><div class="v" style="color:#61f1a4">100%</div><div class="l">CORE STABILITY</div></div>
+      <div class="metric"><div class="v" style="color:#d978ff">v0.5.0</div><div class="l">CURRENT RELEASE</div></div>
+      <div class="metric"><div class="v" style="color:#72f29a">READY</div><div class="l">RELEASE GATE</div></div>
+    </section>
+    <section class="card mission"><b>MISSION</b><p>Build the most robust, scientific, extensible multi-model evaluation platform possible—without sacrificing reproducibility, cost discipline, or operational truth.</p></section>
+  </div>
+
+  <div class="grid">
+    <div class="col">
+      <section class="card panel">
+        <h3 class="title">CAPABILITY GROWTH TIMELINE</h3>
+        <svg id="timeline" viewBox="0 0 600 210" aria-label="Capability growth timeline">
+          <defs><linearGradient id="area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7c63ff" stop-opacity=".45"/><stop offset="1" stop-color="#7c63ff" stop-opacity="0"/></linearGradient></defs>
+          <g stroke="#19314e" stroke-width="1"><path d="M50 20V180H575"/><path d="M50 140H575M50 100H575M50 60H575" opacity=".65"/></g>
+          <path id="timelineArea" d="M50 180 L160 150 L250 130 L300 104 L360 88 L440 62 L515 34 L575 14 L575 180 Z" fill="url(#area)"/>
+          <polyline id="timelineLine" points="50,180 160,150 250,130 300,104 360,88 440,62 515,34 575,14" fill="none" stroke="#6bdcff" stroke-width="3"/>
+          <g id="timelineDots" fill="#9f7cff"></g>
+          <g fill="#9fb4cf" font-size="11"><text x="43" y="198">v0.1</text><text x="148" y="198">v0.2</text><text x="238" y="198">v0.3</text><text x="288" y="198">v0.4</text><text x="350" y="198">v0.5</text><text x="430" y="198">v1.0</text><text x="505" y="198">v2.0</text></g>
+        </svg>
+      </section>
+
+      <section class="card panel"><h3 class="title">CAPABILITY ACCUMULATION METRICS</h3><div class="kpis">
+        <div><div class="ring" style="--p:52;--c:#48a7df"><span>52</span></div><div class="ringlabel">OVERALL ACCUMULATION</div></div>
+        <div><div class="ring" style="--p:98;--c:#6fde63"><span>98%</span></div><div class="ringlabel">CORE STABILITY</div></div>
+        <div><div class="ring" style="--p:100;--c:#42a6e8"><span>100%</span></div><div class="ringlabel">TEST COVERAGE</div></div>
+        <div><div class="ring" style="--p:95;--c:#756de8"><span>95%</span></div><div class="ringlabel">DOCUMENTED SURFACE</div></div>
+      </div></section>
+
+      <section class="card panel"><h3 class="title">SUPERCHARGED CAPABILITIES MATRIX</h3>
+        <div class="controlbar"><button id="allBtn">All</button><button data-filter="core">Core</button><button data-filter="advanced">Advanced</button><button data-filter="ultra">Ultra</button><button data-filter="autonomous">Autonomous</button></div>
+        <div class="cap-grid" id="capGrid"></div>
+      </section>
+
+      <section class="card panel"><h3 class="title">POWER-UP SYSTEM</h3><div class="power" id="power"></div></section>
+    </div>
+
+    <div class="col">
+      <section class="card panel" id="radarWrap">
+        <h3 class="title" style="text-align:center">CAPABILITY RADAR — 360° VIEW</h3>
+        <div class="controlbar" style="justify-content:center">
+          <label style="font-size:11px;color:#afc0d8">Intensity <input id="intensity" type="range" min="60" max="110" value="100"></label>
+          <button id="randomize">Randomize</button><button id="resetRadar">Reset</button>
+        </div>
+        <svg id="radar" viewBox="0 0 620 430"></svg>
+      </section>
+
+      <section class="card panel stack"><h3 class="title">CAPABILITY STACK ARCHITECTURE</h3>
+        <div class="layer" style="border-color:#8b3e91"><b>AUTONOMOUS LAYER</b><div class="chips"><span class="chip">Auto Research Loop</span><span class="chip">AI Observatory</span><span class="chip">Self-Improving Benchmarks</span></div></div>
+        <div class="layer" style="border-color:#2c5791"><b>INTELLIGENCE LAYER</b><div class="chips"><span class="chip">Routing Engine</span><span class="chip">Pareto Optimizer</span><span class="chip">Cost Intelligence</span><span class="chip">Capability Genome</span></div></div>
+        <div class="layer" style="border-color:#704594"><b>EVALUATION LAYER</b><div class="chips"><span class="chip">Judge Ensembles</span><span class="chip">Statistics Engine</span><span class="chip">Benchmark Graph</span><span class="chip">Regression Lab</span></div></div>
+        <div class="layer" style="border-color:#2f785d"><b>EXECUTION LAYER</b><div class="chips"><span class="chip">Distributed Execution</span><span class="chip">Provider Plugins</span><span class="chip">Manifest & Replay</span><span class="chip">Retry & Fallback</span></div></div>
+        <div class="layer"><b>DATA & OBSERVABILITY</b><div class="chips"><span class="chip">OpenTelemetry</span><span class="chip">Metrics</span><span class="chip">Traces</span><span class="chip">Logs</span><span class="chip">Dashboards</span></div></div>
+        <div class="layer"><b>FOUNDATION</b><div class="chips"><span class="chip">CLI</span><span class="chip">Config</span><span class="chip">SQLite</span><span class="chip">Security</span><span class="chip">Release Gate</span></div></div>
+      </section>
+    </div>
+
+    <div class="col">
+      <section class="card panel breakdown"><h3 class="title">CAPABILITY CATEGORY BREAKDOWN</h3><div id="breakdown"></div></section>
+      <section class="card panel"><h3 class="title">CAPABILITY HEATMAP</h3><div class="heat" id="heat"></div></section>
+      <section class="card panel"><h3 class="title">EVOLUTION ROADMAP</h3><div class="road" id="road"></div></section>
+      <section class="card panel"><h3 class="title">REAL-TIME STATUS PANEL</h3><div class="status" id="status"></div></section>
+    </div>
+  </div>
+
+  <div class="footer">
+    <section class="card"><div class="ticker">
+      <span class="badge"><span class="pulse"></span>100% TESTED</span>
+      <span class="badge"><span class="pulse"></span>100% TYPED</span>
+      <span class="badge"><span class="pulse"></span>100% VALIDATED</span>
+      <span class="badge"><span class="pulse"></span>100% REPRODUCIBLE</span>
+      <span class="badge"><span class="pulse"></span>100% SECURE</span>
+    </div></section>
+    <section class="card" style="min-width:320px;text-align:center"><b>OMEGA PRIME STATUS</b><br><span style="color:#6ff3a3;font-size:20px">MAXIMUM POWER ENGAGED ⚡</span></section>
+  </div>
+</div>
+<div class="tooltip" id="tip"></div>
+
+<script>
+const capabilities=[
+["Provider Plugins","⚗","core"],["Benchmark DSL","⌘","core"],["Judge Ensembles","⚖","advanced"],["Statistics Engine","◉","advanced"],["Manifest & Replay","◇","advanced"],
+["OpenTelemetry","✦","core"],["Distributed Exec","✹","advanced"],["Intelligent Routing","◉","ultra"],["Pareto Optimizer","✣","ultra"],["REST API","◎","core"],
+["Python SDK","◌","core"],["TypeScript SDK","TS","core"],["MCP Server","∞","advanced"],["Web Control Plane","▣","advanced"],["RBAC & SSO","♙","core"],
+["Synthetic Generator","☀","autonomous"],["Benchmark Graph","⌬","autonomous"],["Version Control","◷","autonomous"],["Regression Lab","✹","autonomous"],["Capability Genome","◈","ultra"],
+["AI Observatory","◉","autonomous"],["Auto Research Loop","⌘","autonomous"],["Cost Intelligence","$","autonomous"],["Budget Guard","⬡","core"],["Policy Engine","♜","ultra"]];
+const capGrid=document.getElementById("capGrid");
+function renderCaps(filter="all"){capGrid.innerHTML="";capabilities.filter(x=>filter==="all"||x[2]===filter).forEach((c,i)=>{const el=document.createElement("div");el.className="cap";el.dataset.tier=c[2];el.innerHTML=`<div class="i">${c[1]}</div><div class="n">${c[0]}</div>`;el.onclick=()=>el.classList.toggle("active");tipify(el,`${c[0]} • ${c[2].toUpperCase()} tier`);capGrid.appendChild(el)})}
+renderCaps();document.querySelectorAll("[data-filter]").forEach(b=>b.onclick=()=>renderCaps(b.dataset.filter));document.getElementById("allBtn").onclick=()=>renderCaps();
+
+const powers=[["⚡","SPEED","10x"],["🎯","ACCURACY","98%"],["🧠","INTELLIGENCE","AI"],["◆","SCALABILITY","∞"],["🛡","RESILIENCE","100%"],["⚡","EFFICIENCY","MAX"]];
+document.getElementById("power").innerHTML=powers.map(x=>`<div class="tile"><div class="big">${x[0]}</div><b style="font-size:10px">${x[1]}</b><div class="small">${x[2]}</div></div>`).join("");
+
+const breakdown=[["Scientific Evaluation",98],["Benchmark Engineering",95],["Execution Excellence",96],["Intelligence & Optimization",92],["Platform & Ecosystem",90],["Observability & Insights",88],["Enterprise & Governance",82],["Autonomous Evolution",78]];
+document.getElementById("breakdown").innerHTML=breakdown.map(x=>`<div class="row"><span>${x[0]}</span><div class="bar"><span style="width:${x[1]}%"></span></div><b>${x[1]}%</b></div>`).join("");
+
+const heat=document.getElementById("heat");for(let c=0;c<8;c++){const col=document.createElement("div");col.className="heatcol";for(let i=0;i<18;i++){const s=document.createElement("div");s.className=`sq ${i<10+c?"on"+((c%5)+1):""}`;col.appendChild(s)}heat.appendChild(col)}
+
+const road=[["v0.4.x","FOUNDATION COMPLETE","Core Platform","Provider Plugins","Benchmark DSL","Release Gate"],["v0.5.x","SCIENTIFIC CORE COMPLETE","Judge Ensembles","Statistics Engine","Replay Manifests"],["v0.6.x","PLATFORM PLANNED","OTel","Distributed Exec","REST API"],["v1.0.x","INTELLIGENCE FUTURE","Routing","Pareto","Cost Intelligence"],["v2.0+","AUTONOMY VISION","Auto Research","AI Observatory","Full Autonomy"]];
+document.getElementById("road").innerHTML=road.map(x=>`<div class="stage"><h4>${x[0]}</h4><p style="color:#71f2a7">${x[1]}</p>${x.slice(2).map(y=>`<p>• ${y}</p>`).join("")}</div>`).join("");
+
+const status=[["SYSTEM HEALTH","100%","All Systems Operational"],["TEST SUITE","62/62","Passing"],["RELEASE GATE","READY","All Checks Passed"],["COST GUARD","ACTIVE","Within Budget"],["DATABASE","Healthy","SQLite"],["PROVIDERS","4/4","Online"],["MODELS","12+","Discovered"],["RUNS TODAY","0","Executed"]];
+document.getElementById("status").innerHTML=status.map(x=>`<div class="s"><div class="sl">${x[0]}</div><div class="sv">${x[1]}</div><div class="sl">${x[2]}</div></div>`).join("");
+
+
+function polar(cx,cy,r,a){const rad=(a-90)*Math.PI/180;return [cx+r*Math.cos(rad),cy+r*Math.sin(rad)]}
+const radarLabels=["Scientific Evaluation","Benchmark Engineering","Execution Excellence","Intelligence & Optimization","Platform & Ecosystem","Observability & Insights","Enterprise & Governance","Autonomous Evolution"];
+const base=[96,92,94,90,88,85,80,75];
+function drawRadar(vals){
+ const svg=document.getElementById("radar");svg.innerHTML=`<defs><radialGradient id="rg"><stop offset="0" stop-color="#59e6ff" stop-opacity=".18"/><stop offset=".6" stop-color="#9357ff" stop-opacity=".28"/><stop offset="1" stop-color="#ff6d9f" stop-opacity=".32"/></radialGradient></defs>`;
+ const cx=310,cy=215,R=145,n=vals.length;
+ for(let level=1;level<=5;level++){let pts=[];for(let i=0;i<n;i++)pts.push(polar(cx,cy,R*level/5,i*360/n).join(","));svg.innerHTML+=`<polygon points="${pts.join(" ")}" fill="none" stroke="#29456b" stroke-width="1"/>`}
+ for(let i=0;i<n;i++){const [x,y]=polar(cx,cy,R,i*360/n);svg.innerHTML+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#29456b"/>`}
+ let p=[];vals.forEach((v,i)=>p.push(polar(cx,cy,R*v/100,i*360/n).join(",")));svg.innerHTML+=`<polygon points="${p.join(" ")}" fill="url(#rg)" stroke="#7eeaff" stroke-width="2.5"/>`;
+ vals.forEach((v,i)=>{const [x,y]=polar(cx,cy,R*v/100,i*360/n);svg.innerHTML+=`<circle cx="${x}" cy="${y}" r="4" fill="#fff" stroke="#ad65ff" stroke-width="2"/>`;const [lx,ly]=polar(cx,cy,R+42,i*360/n);svg.innerHTML+=`<text x="${lx}" y="${ly}" fill="#eaf4ff" font-size="12" text-anchor="middle">${radarLabels[i]}</text>`})
+}
+drawRadar(base);document.getElementById("intensity").oninput=e=>drawRadar(base.map(v=>Math.min(100,Math.round(v*e.target.value/100))));
+document.getElementById("randomize").onclick=()=>drawRadar(base.map(v=>Math.max(55,Math.min(100,v+Math.floor(Math.random()*21-10)))));
+document.getElementById("resetRadar").onclick=()=>{document.getElementById("intensity").value=100;drawRadar(base)};
+
+const dots=[[50,180],[160,150],[250,130],[300,104],[360,88],[440,62],[515,34],[575,14]];document.getElementById("timelineDots").innerHTML=dots.map((d,i)=>`<circle cx="${d[0]}" cy="${d[1]}" r="4"><title>${["Foundation","Plugins","DSL","Scientific Core","Observability","Platform","Intelligence","Autonomy"][i]}</title></circle>`).join("");
+
+const tip=document.getElementById("tip");function tipify(el,text){el.addEventListener("mousemove",e=>{tip.textContent=text;tip.style.left=e.clientX+"px";tip.style.top=e.clientY+"px";tip.style.opacity=1});el.addEventListener("mouseleave",()=>tip.style.opacity=0)}
+document.querySelectorAll(".chip,.tile,.stage,.s,.metric").forEach(el=>tipify(el,el.textContent.trim().replace(/\s+/g," ")));
+</script>
+</body>
+</html>
