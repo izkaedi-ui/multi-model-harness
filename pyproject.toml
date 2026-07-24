@@ -98,3 +98,35 @@ markers = [
     "integration: marks tests that require live API credentials",
     "slow: marks tests that take more than 5 seconds",
 ]
+
+[tool.mutmut]
+source_paths = [
+    "evaluators/evaluation_integrity.py",
+    "security/evaluation_integrity_gate.py",
+]
+
+pytest_add_cli_args_test_selection = [
+    "tests/unit/test_evaluation_integrity.py",
+    "tests/unit/test_evaluation_integrity_suite.py",
+    "tests/unit/test_evaluation_integrity_extended.py",
+    "tests/unit/test_evaluation_integrity_e2e.py",
+]
+
+also_copy = [
+    "runner/",
+    "database/",
+    "adapters/",
+    "telemetry/",
+    "src/",
+    "benchmark_dsl/",
+    "categories/",
+    "cli/",
+    "security/",
+    "evaluators/",
+    "pyproject.toml",
+]
+
+pytest_add_cli_args = [
+    "-q",
+    "--disable-warnings",
+]
