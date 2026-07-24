@@ -176,11 +176,15 @@ def doctor() -> None:
 def serve_metrics(host: str, port: int) -> None:
     """Start a persistent Prometheus metrics HTTP server daemon."""
     import time
+    from telemetry.metrics import build_prometheus_metrics
     from telemetry.server import MetricsServer
+
+    _metrics = build_prometheus_metrics()
 
     server = MetricsServer(port=port, address=host)
     if server.start():
         click.echo(f"Prometheus metrics server running at http://{host}:{port}/metrics")
+
         click.echo("Press Ctrl+C to stop.")
         try:
             while True:
