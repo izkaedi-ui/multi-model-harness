@@ -10,10 +10,10 @@ Build a trustworthy AI evaluation platform whose conclusions are supported by ev
 
 ---
 
-## 🏛️ The 7-Level Architecture Hierarchy & Proof Pipeline
+## 🏛️ The 7-Stage Governance Pipeline & Proof Chain
 
 ```text
-Mission  ──▶  Principles  ──▶  Engineering Guarantees  ──▶  Verification  ──▶  Evidence Artifact  ──▶  Release Gate  ──▶  Trust Claim
+Mission  ──▶  Principles  ──▶  Engineering Guarantees  ──▶  Verification Funnel  ──▶  Evidence Observatory  ──▶  Release Gate  ──▶  Verified Trust Claims
 ```
 
 ---
@@ -29,15 +29,15 @@ Mission  ──▶  Principles  ──▶  Engineering Guarantees  ──▶  Ve
 
 ---
 
-## 🛡️ The Five Engineering Guarantees & Verifiable Trust Claims
+## 🛡️ The Five Guarantees, Evidence Observatory & Traceable Trust Claims
 
-| Guarantee | Verification Question | Required Evidence Artifact | Verified Trust Claim |
-| :--- | :--- | :--- | :--- |
-| ⚖️ **Evaluation Integrity** | *Can the evaluation be manipulated?* | Adversarial suite & judge-resistance report | Benchmark results are resistant to prompt injection and evaluator manipulation. |
-| 🔄 **Reproducibility** | *Can this result be reproduced?* | Signed replay manifest & environment fingerprint | Results can be bit-for-bit replayed or environment drift is explicitly identified. |
-| 📉 **Drift Awareness** | *Did the model silently change?* | Drift analysis report with statistical CIs | Statistically significant behavior and cost changes are automatically detected. |
-| 🔌 **Trusted Extensibility** | *Can extensions be trusted?* | Plugin verification report & compatibility manifest | Dynamic plugins pass interface verification and credential boundary isolation. |
-| 🔒 **Confidential Observability** | *Did telemetry leak protected data?* | Secret-leak audit report (zero findings) | Telemetry pipelines scrub secrets and prompts before export. |
+| Engineering Guarantee | Verification Funnel (CI Job) | Evidence Observatory Artifact | Machine Release Gate | Verified Trust Claim |
+| :--- | :--- | :--- | :--- | :--- |
+| ⚖️ **Evaluation Integrity** | `pytest tests/unit/test_benchmark_dsl.py` | `reports/judge_resistance.json` | `checks.benchmark_dsl == true` | Benchmark results are resistant to prompt injection and evaluator manipulation. |
+| 🔄 **Reproducibility** | `pytest tests/unit/test_execution_plan.py` | `manifests/manifest_<run_id>.json` | `checks.validation == true` | Results can be bit-for-bit replayed or environment drift is explicitly identified. |
+| 📉 **Drift Awareness** | `python -m cli.main leaderboard` | `database/harness.db` | `checks.database_integrity == true` | Statistically significant behavior and cost changes are automatically detected. |
+| 🔌 **Trusted Extensibility** | `pytest tests/unit/test_provider_plugins.py` | `plugins/plugin_manifest.json` | `checks.compilation == true` | Dynamic plugins pass interface verification and credential boundary isolation. |
+| 🔒 **Confidential Observability** | `pytest tests/unit/test_telemetry_*.py` | `telemetry/telemetry_audit.log` | `checks.telemetry_secret_safety == true` | Telemetry pipelines scrub secrets and prompts before export. |
 
 ---
 
