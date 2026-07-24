@@ -121,7 +121,7 @@ def test_level3_provenance_chain_validation_success(test_signing_key: bytes) -> 
     rec2 = DecisionRecord.create(
         decision_id="d2", correlation_id="c2", tenant_id="t1", user_id="u1", resource_id="r1", action="UPDATE", verdict="ALLOW", stream_sequence=2, previous_record_digest=rec1.current_record_digest, signing_key=test_signing_key
     )
-    assert ProvenanceChain.validate_chain([rec1, rec2], signing_key=test_signing_key) is True
+    assert ProvenanceChain.validate_chain([rec1, rec2], signing_key_or_public_key=test_signing_key) is True
 
 
 def test_level3_broken_chain_link_rejected(test_signing_key: bytes) -> None:
@@ -132,7 +132,7 @@ def test_level3_broken_chain_link_rejected(test_signing_key: bytes) -> None:
         decision_id="d2", correlation_id="c2", tenant_id="t1", user_id="u1", resource_id="r1", action="UPDATE", verdict="ALLOW", stream_sequence=2, previous_record_digest="TAMPERED_PREV_DIGEST", signing_key=test_signing_key
     )
     with pytest.raises(DecisionProvenanceError):
-        ProvenanceChain.validate_chain([rec1, rec2], signing_key=test_signing_key)
+        ProvenanceChain.validate_chain([rec1, rec2], signing_key_or_public_key=test_signing_key)
 
 
 def test_level3_sequence_break_rejected(test_signing_key: bytes) -> None:
@@ -143,7 +143,7 @@ def test_level3_sequence_break_rejected(test_signing_key: bytes) -> None:
         decision_id="d2", correlation_id="c2", tenant_id="t1", user_id="u1", resource_id="r1", action="UPDATE", verdict="ALLOW", stream_sequence=3, previous_record_digest=rec1.current_record_digest, signing_key=test_signing_key
     )
     with pytest.raises(DecisionProvenanceError):
-        ProvenanceChain.validate_chain([rec1, rec2], signing_key=test_signing_key)
+        ProvenanceChain.validate_chain([rec1, rec2], signing_key_or_public_key=test_signing_key)
 
 
 def test_level3_duplicate_decision_id_rejected(test_signing_key: bytes) -> None:
@@ -154,7 +154,7 @@ def test_level3_duplicate_decision_id_rejected(test_signing_key: bytes) -> None:
         decision_id="d1", correlation_id="c2", tenant_id="t1", user_id="u1", resource_id="r1", action="UPDATE", verdict="ALLOW", stream_sequence=2, previous_record_digest=rec1.current_record_digest, signing_key=test_signing_key
     )
     with pytest.raises(DecisionProvenanceError):
-        ProvenanceChain.validate_chain([rec1, rec2], signing_key=test_signing_key)
+        ProvenanceChain.validate_chain([rec1, rec2], signing_key_or_public_key=test_signing_key)
 
 
 def test_sensitive_secret_exclusion_enforced(test_signing_key: bytes) -> None:
