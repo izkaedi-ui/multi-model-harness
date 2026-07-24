@@ -41,7 +41,7 @@ The platform guarantees seven non-negotiable trust boundaries backed by empirica
 
 ### 🎯 The Definition of Done (v1.0.0 Machine Release Gate)
 
-The platform reaches **v1.0.0 Trustworthy Evaluation Platform** maturity when the automated release gate verifies evidence for all six guarantees:
+The platform reaches **v1.0.0 Trustworthy Evaluation Platform** maturity when the automated release gate verifies evidence for all seven guarantees (26 machine checks):
 
 ```text
 Release Gate Verification (v1.0.0 Target)
@@ -52,7 +52,8 @@ Release Gate Verification (v1.0.0 Target)
 ☑ Trusted Extensibility verification passes with no credential or boundary violations
 ☑ Confidential Observability audit confirms zero prompt or secret leakage
 ☑ Object Authorization & Tenant Isolation suite passes (zero cross-tenant IDOR leaks)
-☑ Unit, integration, and regression test suites pass (100% green)
+☑ Decision Provenance & Outer-Wall Evaluator Isolation suite passes (Ed25519 signatures, append-only log, scrubbed subprocesses)
+☑ Unit, integration, and regression test suites pass (100% green across 283 tests)
 ☑ Immutable signed release manifests generated
 ```
 

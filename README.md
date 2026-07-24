@@ -30,7 +30,7 @@ Mission  ──▶  Principles  ──▶  Engineering Guarantees  ──▶  Ve
 
 ---
 
-## 🛡️ The Six Guarantees, Evidence Observatory & Traceable Trust Claims
+## 🛡️ The Seven Guarantees, Evidence Observatory & Traceable Trust Claims
 
 | Engineering Guarantee | Verification Funnel (CI Job) | Evidence Observatory Artifact | Machine Release Gate | Verified Trust Claim |
 | :--- | :--- | :--- | :--- | :--- |
