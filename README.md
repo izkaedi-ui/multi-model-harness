@@ -1,168 +1,347 @@
 # Multi-Provider LLM Security & Evaluation Platform
 
-> **An AI evaluation platform built around five engineering guarantees, each backed by verifiable evidence.**
+> A reproducible security evaluation framework for benchmarking, validating, and comparing Large Language Models across multiple providers.
+
+[![Release](https://img.shields.io/github/v/release/izkaedi-ui/multi-model-harness)](../../releases)
+[![Python](https://img.shields.io/badge/python-3.12+-blue.svg)](https://python.org)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
+Evaluate OpenAI, Anthropic, Gemini, xAI, and other providers using reproducible security benchmarks, automated scoring, signed evidence artifacts, statistical analysis, and machine-verifiable release gates.
 
 ---
 
-## 🎯 Project Mission & Charter
+# Features
 
-Build a trustworthy AI evaluation platform whose conclusions are supported by evidence rather than assumptions. Every core property of the platform must be expressed as an **engineering guarantee** and verified through automated tests, reproducible evidence artifacts, and machine release gates.
-
----
-
-## 🏛️ The 7-Stage Governance Pipeline & Proof Chain
-
-```text
-Mission  ──▶  Principles  ──▶  Engineering Guarantees  ──▶  Verification Funnel  ──▶  Evidence Observatory  ──▶  Release Gate  ──▶  Verified Trust Claims
-```
-
----
-
-## 📐 Foundational Engineering Principles
-
-1. 📊 **Measure before concluding**: Every score is grounded in raw data, confidence intervals, and judge agreement.
-2. 🔄 **Reproduce before comparing**: No evaluation is valid without a matching signed replay manifest and environment fingerprint.
-3. 📉 **Detect change before reacting**: Statistically significant model drift must be detected and documented over time.
-4. 🔌 **Verify extensions before trusting them**: Dynamic plugins must pass metadata verification and credential boundary isolation.
-5. 🔒 **Observe systems without exposing sensitive data**: Telemetry scrubbers guarantee zero prompt or secret leakage across logs, traces, and metrics.
-6. 🔑 **Enforce tenant ownership on every object reference**: Resource handles guarantee strict cross-tenant isolation and anti-enumeration.
-7. 🎯 **Prefer evidence over inference**: Every architectural claim must be backed by automated tests, statistical CIs, replay manifests, or release gate verdicts.
+- Multi-provider LLM evaluation
+- Security-focused benchmark suite
+- Reproducible execution manifests
+- Statistical scoring & confidence metrics
+- Cost estimation before execution
+- Provider plugin architecture
+- Standalone HTML dashboard
+- Machine-verifiable release gate
+- Signed decision provenance (SHA-256 + Ed25519)
+- Secret-safe telemetry & logging
+- SQLite-backed execution history
+- Fully configurable benchmark DSL
 
 ---
 
-## 🛡️ The Seven Guarantees, Evidence Observatory & Traceable Trust Claims
-
-| Engineering Guarantee | Verification Funnel (CI Job) | Evidence Observatory Artifact | Machine Release Gate | Verified Trust Claim |
-| :--- | :--- | :--- | :--- | :--- |
-| ⚖️ **Evaluation Integrity** | `pytest tests/unit/test_benchmark_dsl.py` | `reports/judge_resistance.json` | `checks.benchmark_dsl == true` | Benchmark results are resistant to prompt injection and evaluator manipulation. |
-| 🔄 **Reproducibility** | `pytest tests/unit/test_execution_plan.py` | `manifests/manifest_<run_id>.json` | `checks.validation == true` | Results can be bit-for-bit replayed or environment drift is explicitly identified. |
-| 📉 **Drift Awareness** | `python -m cli.main leaderboard` | `database/harness.db` | `checks.database_integrity == true` | Statistically significant behavior and cost changes are automatically detected. |
-| 🔌 **Trusted Extensibility** | `pytest tests/unit/test_provider_plugins.py` | `plugins/plugin_manifest.json` | `checks.compilation == true` | Dynamic plugins pass interface verification and credential boundary isolation. |
-| 🔒 **Confidential Observability** | `pytest tests/unit/test_telemetry_*.py` | `telemetry/telemetry_audit.log` | `checks.telemetry_secret_safety == true` | Telemetry pipelines scrub secrets and prompts before export. |
-| 🔑 **Object Authorization** | `pytest tests/unit/test_object_authorization.py` | `reports/object_authorization.json` | `checks.object_authorization == true` | Object references enforce tenant boundaries, child-parent integrity, and 404 anti-enumeration. |
-| 📜 **Decision Provenance** | `pytest tests/unit/test_decision_provenance.py` | `reports/decision_provenance.json` | `checks.decision_provenance == true` | Decisions are canonicalized, SHA-256 hashed, Ed25519 asymmetric signed, and transactionally stored. |
-
----
-
-## ⚖️ Contributor Decision Rubric
-
-Before proposing or implementing any feature, pull request, or roadmap item, answer:
-
-```text
-[ ] Which engineering guarantee does this improve?
-[ ] What verification demonstrates it works?
-[ ] What evidence artifact proves the verification?
-[ ] How is it incorporated into the machine release gate?
-```
-
-*If these questions cannot be answered with empirical evidence, the proposal is deferred.*
-
----
-
-## Supported Providers
+# Supported Providers
 
 | Provider | Adapter | Status |
-|---|---|---|
-| OpenAI | `OpenAIAdapter` | ✅ Native Implementation |
-| Anthropic | `AnthropicAdapter` | ✅ Native Implementation |
-| Google Gemini | `GeminiAdapter` | ✅ Native Implementation |
-| xAI / Grok | `XAIAdapter` | ✅ Native Implementation |
+|-----------|---------|--------|
+| OpenAI | `OpenAIAdapter` | ✅ |
+| Anthropic | `AnthropicAdapter` | ✅ |
+| Google Gemini | `GeminiAdapter` | ✅ |
+| xAI / Grok | `XAIAdapter` | ✅ |
 
+---
 
+# Evaluation Categories
 
-## Evaluation Categories
+| Category | Example Metrics |
+|-----------|----------------|
+| Guardrail Consistency | Refusal consistency, transformation stability |
+| Tool Use Boundaries | Unauthorized tool calls, argument validation |
+| Prompt Robustness | Typo resilience, Unicode resilience |
+| Context Isolation | Cross-session leakage detection |
+| Long Context Behavior | Retrieval accuracy, contradiction detection |
+| Content Integrity | Structured output validity, citation accuracy |
 
-| Category | Key Metrics |
-|---|---|
-| Guardrail consistency | Refusal consistency, transformation stability, false-positive rate |
-| Tool-use boundaries | Unauthorized call rate, argument validation, confirmation compliance |
-| Prompt robustness | Semantic consistency, typo resilience, unicode resilience |
-| Context isolation | Cross-session leak rate, role boundary compliance |
-| Long-context behavior | Retrieval accuracy, contradiction detection, attribution |
-| Content integrity | Structured output validity, citation validity, markup safety |
+---
 
-## Quick Start
+# Quick Start
+
+## 1. Install
 
 ```bash
-# 1. Clone and install
+git clone https://github.com/izkaedi-ui/multi-model-harness.git
+cd multi-model-harness
+
 pip install -e ".[dev]"
+```
 
-# 2. Copy and fill environment
+## 2. Configure
+
+```bash
 cp .env.example .env
-# Edit .env — add your API keys
+```
 
-# 3. Bootstrap
+Edit `.env` and add your provider API keys.
+
+---
+
+## 3. Bootstrap
+
+```bash
 python scripts/bootstrap.py
 python scripts/initialize_database.py
 python scripts/seed_examples.py
+```
 
-# 4. Validate configuration
+---
+
+## 4. Validate
+
+```bash
 harness validate
+```
 
-# 5. Estimate cost before running
-harness estimate-cost --provider openai --cases 5
+---
 
-# 6. Run a smoke test (harmless, minimal spend)
+## 5. Estimate Cost
+
+```bash
+harness estimate-cost \
+    --provider openai \
+    --cases 5
+```
+
+---
+
+## 6. Smoke Test
+
+```bash
 python scripts/run_smoke_tests.py
+```
 
-# 7. Full run
-harness run --providers openai,anthropic --categories guardrail_consistency
+---
 
-# 8. Open the dashboard
+## 7. Run Benchmarks
+
+```bash
+harness run \
+    --providers openai,anthropic \
+    --categories guardrail_consistency
+```
+
+---
+
+## 8. Launch Dashboard
+
+```bash
 harness dashboard
 ```
 
-## Cost Controls
+---
 
-Spend limits are enforced **before** any API call is dispatched. See `config/budgets.yaml`.
-Default global cap: **$35.00** across all providers.
+# Engineering Guarantees
 
-## Safe-Use Rules
+The platform is built around seven engineering guarantees. Every guarantee is validated through automated verification and produces evidence artifacts.
 
-1. Never put real credentials, PII, or live secrets into test cases.
-2. Use synthetic markers (e.g., `BLUE-ORBIT-731`) as probe values.
-3. The harness redacts API keys and bearer tokens from all logs and reports automatically.
-4. Run `scripts/purge_sensitive_artifacts.py` before sharing any artifact bundles.
+| Engineering Guarantee | Verification | Evidence Artifact |
+|-----------------------|--------------|-------------------|
+| Evaluation Integrity | Judge-resistance tests | `reports/judge_resistance.json` |
+| Reproducibility | Replay validation | Signed execution manifests |
+| Drift Awareness | Historical comparisons | SQLite execution database |
+| Trusted Extensibility | Plugin validation | Plugin manifests |
+| Confidential Observability | Telemetry verification | Telemetry audit logs |
+| Object Authorization | Authorization tests | Object authorization reports |
+| Decision Provenance | Cryptographic verification | Signed decision records |
 
-## Architecture
+---
+
+# Release Gate
+
+Every release must successfully pass the automated release gate.
+
+Current checks include:
+
+- ✅ Compilation
+- ✅ Unit Tests
+- ✅ Configuration Validation
+- ✅ Benchmark DSL Validation
+- ✅ Database Integrity
+- ✅ Evaluation Integrity
+- ✅ Object Authorization
+- ✅ Decision Provenance
+- ✅ Telemetry Safety
+- ✅ Environment Isolation
+
+A release is considered production-ready only after all release checks pass.
+
+Example:
+
+```text
+===========================================
+ Multi-Provider Harness Release Readiness
+===========================================
+
+Compilation................PASS
+Unit Tests.................PASS
+Validation.................PASS
+Database Integrity.........PASS
+Evaluation Integrity.......PASS
+Decision Provenance........PASS
+
+VERDICT: READY FOR RELEASE
+```
+
+---
+
+# Project Architecture
 
 ```
-adapters/     Provider-specific API clients (normalized interface)
-categories/   Test case definitions + evaluators per security category
-runner/       Lifecycle orchestration, scheduling, scoring, persistence
-database/     SQLite schema + async repository layer
-evaluation/   Scoring primitives (exact match, schema validation, etc.)
-security/     Redaction, input validation, output sanitization
-reports/      HTML, JSON, Markdown, CSV report generation
-dashboard/    Standalone HTML/JS dashboard (no server required)
-cli/          Click-based command-line interface
+adapters/
+benchmark_dsl/
+categories/
+cli/
+dashboard/
+database/
+evaluation/
+reports/
+runner/
+security/
+telemetry/
+tests/
 ```
 
-See `docs/architecture.md` for the full design.
+Additional architecture documentation is available under:
 
-## Database Lifecycle
+```
+docs/
+```
+
+---
+
+# Cost Controls
+
+API spending is enforced **before** any provider requests are dispatched.
+
+Default global budget:
+
+```
+$35.00
+```
+
+Configuration:
+
+```
+config/budgets.yaml
+```
+
+---
+
+# Dashboard
+
+Export results:
 
 ```bash
-harness migrate          # Apply all pending migrations
+harness export --run-id <RUN_ID>
+```
+
+Launch:
+
+```bash
+harness dashboard
+```
+
+The dashboard is completely static and requires no backend server.
+
+---
+
+# Reporting
+
+Generate reports in multiple formats.
+
+```bash
+harness report \
+    --run-id <RUN_ID> \
+    --format html,json,markdown
+```
+
+---
+
+# Database Lifecycle
+
+Apply migrations:
+
+```bash
+harness migrate
+```
+
+Preview migrations:
+
+```bash
 harness migrate --dry-run
 ```
 
-## Dashboard
+---
 
-Open `dashboard/index.html` in any browser. Load a fixture JSON via drag-and-drop
-or the file picker. No server, no API keys required.
+# Safe Usage
 
-```bash
-harness export --run-id <id>   # Writes dashboard/fixture.json
-harness dashboard              # Opens index.html in the default browser
-```
-
-## Reporting
+- Never use production credentials.
+- Never include real customer data.
+- Use synthetic markers (for example `BLUE-ORBIT-731`) when testing context isolation.
+- API keys and bearer tokens are automatically redacted.
+- Run:
 
 ```bash
-harness report --run-id <id> --format html,json,markdown
+python scripts/purge_sensitive_artifacts.py
 ```
 
-## License
+before sharing artifacts publicly.
 
-MIT
+---
+
+# Project Mission
+
+Build an AI evaluation platform whose conclusions are supported by reproducible evidence rather than assumptions.
+
+Every architectural claim should be backed by:
+
+- Automated testing
+- Statistical evidence
+- Replay manifests
+- Cryptographic verification
+- Machine-verifiable release gates
+
+---
+
+# Contributor Checklist
+
+Before implementing any feature, answer:
+
+- [ ] Which engineering guarantee does this improve?
+- [ ] Which automated verification proves it?
+- [ ] What evidence artifact demonstrates it?
+- [ ] How is it incorporated into the release gate?
+
+Features that cannot answer these questions with empirical evidence should not be merged.
+
+---
+
+# Roadmap
+
+- [ ] Additional provider adapters
+- [ ] Distributed benchmark execution
+- [ ] Automatic drift alerts
+- [ ] Interactive benchmark authoring
+- [ ] Web dashboard improvements
+- [ ] Additional benchmark categories
+- [ ] CI/CD release automation
+
+---
+
+# License
+
+MIT License
+
+---
+
+## Repository Status
+
+| Component | Status |
+|-----------|--------|
+| Release Gate | ✅ Passing |
+| Unit Tests | ✅ Passing |
+| Decision Provenance | ✅ Verified |
+| Evaluation Integrity | ✅ Verified |
+| Object Authorization | ✅ Verified |
+| GitHub Releases | ✅ Published |
+| Tagged Release | **v0.6.3** |
+
+---
+
+Built for trustworthy, reproducible, evidence-based evaluation of modern Large Language Models.
