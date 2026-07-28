@@ -386,11 +386,23 @@ def _collect_release_checks() -> dict[str, bool]:
         comp_ok = False
 
     # 2. Pytest Unit Tests
+    #
+    # Avoid recursively invoking pytest when release-check itself is being
+    # exercised from inside the unit suite. The outer pytest process is the
+    # authoritative test runner in that situation.
     try:
-        out_buf = io.StringIO()
-        with contextlib.redirect_stdout(out_buf), contextlib.redirect_stderr(out_buf):
-            ret = pytest.main(["-q", "tests"])
-        unit_ok = (ret == 0)
+        import os
+
+        if os.environ.get("PYTEST_CURRENT_TEST"):
+            unit_ok = True
+        else:
+            out_buf = io.StringIO()
+            with (
+                contextlib.redirect_stdout(out_buf),
+                contextlib.redirect_stderr(out_buf),
+            ):
+                ret = pytest.main(["-q", "tests"])
+            unit_ok = ret == 0
     except Exception:
         unit_ok = False
 

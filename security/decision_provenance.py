@@ -397,10 +397,14 @@ def assert_decision_provenance_gate(signing_key: bytes | None = None) -> dict[st
 
     # 3. ProvenanceStore Atomic Append-Only Persistence Verification
     try:
+        import tempfile
+
         from security.provenance_store import ProvenanceStore
-        store = ProvenanceStore(db_path=":memory:")
-        store.append("gate_stream", ed_rec1, ed_pub)
-        store_ok = store.verify_stored_stream("gate_stream", ed_pub)
+
+        with tempfile.NamedTemporaryFile(suffix=".db") as temp_db:
+            store = ProvenanceStore(db_path=temp_db.name)
+            store.append("gate_stream", ed_rec1, ed_pub)
+            store_ok = store.verify_stored_stream("gate_stream", ed_pub)
     except Exception:
         store_ok = False
 

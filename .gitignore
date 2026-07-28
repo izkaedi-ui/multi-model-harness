@@ -65,3 +65,17 @@ harness-manifest.csv
 .schema
 .tables
 SELECT
+
+.env
+__pycache__/
+*.log
+
+# Local recon output
+recon/
+all_subdomains.txt
+amass_*.txt
+live_hosts.txt
+resolved_subdomains.txt
+subdomains*.txt
+subfinder_sorted.txt
+scopes_for_*.csv
